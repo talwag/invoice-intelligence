@@ -7,7 +7,7 @@ export async function GET(
 ) {
   const apiKey = request.headers.get("X-API-Key");
 
-  if (!apiKey || apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
+  if (!apiKey || apiKey !== process.env.API_KEY) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
