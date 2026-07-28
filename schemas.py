@@ -12,10 +12,10 @@ class InvoiceItem(BaseModel):
 
 class InvoiceExtraction(BaseModel):
     vendor: str = Field(description="Company or person who issued the invoice")
-    vendor_id: Optional[str] = Field(description="Israeli business ID (ח.פ. or ע.מ.), null if not found")
-    invoice_number: Optional[str] = Field(description="Invoice number or reference ID")
-    invoice_date: Optional[date] = Field(description="Date the invoice was issued")
-    due_date: Optional[date] = Field(description="Payment due date, null if not specified")
+    vendor_id: Optional[str] = Field(default=None, description="Israeli business ID (ח.פ. or ע.מ.), null if not found")
+    invoice_number: Optional[str] = Field(default=None, description="Invoice number or reference ID")
+    invoice_date: Optional[date] = Field(default=None, description="Date the invoice was issued")
+    due_date: Optional[date] = Field(default=None, description="Payment due date, null if not specified")
     items: List[InvoiceItem] = Field(description="List of all line items in the invoice")
     subtotal: float = Field(description="Total before VAT in ILS")
     vat_rate: float = Field(description="VAT percentage as decimal: 0.17 for 17%")
