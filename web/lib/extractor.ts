@@ -30,6 +30,55 @@ export interface InvoiceExtraction {
 
 const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
+export function isValidInvoiceItem(value: unknown): value is InvoiceItem {
+  if (typeof value !== "object" || value === null) return false;
+  const item = value as Record<string, unknown>;
+  return (
+    typeof item.description === "string" &&
+    typeof item.quantity === "number" &&
+    typeof item.unit_price === "number" &&
+    typeof item.line_total === "number"
+  );
+}
+
+export function validateInvoiceExtraction(data: unknown): InvoiceExtraction {
+  if (typeof data !== "object" || data === null) {
+    throw new ExtractionError("Extraction result was not a JSON object");
+  }
+  const d = data as Record<string, unknown>;
+
+  const isNullableString = (v: unknown) => v === null || typeof v === "string";
+
+  if (typeof d.vendor !== "string" || d.vendor.trim() === "") {
+    throw new ExtractionError("Extraction result is missing 'vendor'");
+  }
+  if (!isNullableString(d.vendor_id)) {
+    throw new ExtractionError("Extraction result has an invalid 'vendor_id'");
+  }
+  if (!isNullableString(d.invoice_number)) {
+    throw new ExtractionError("Extraction result has an invalid 'invoice_number'");
+  }
+  if (!isNullableString(d.invoice_date)) {
+    throw new ExtractionError("Extraction result has an invalid 'invoice_date'");
+  }
+  if (!isNullableString(d.due_date)) {
+    throw new ExtractionError("Extraction result has an invalid 'due_date'");
+  }
+  if (!Array.isArray(d.items) || !d.items.every(isValidInvoiceItem)) {
+    throw new ExtractionError("Extraction result has invalid or missing 'items'");
+  }
+  for (const field of ["subtotal", "vat_rate", "vat_amount", "total", "confidence"] as const) {
+    if (typeof d[field] !== "number") {
+      throw new ExtractionError(`Extraction result has an invalid '${field}'`);
+    }
+  }
+  if (typeof d.currency !== "string") {
+    throw new ExtractionError("Extraction result has an invalid 'currency'");
+  }
+
+  return d as unknown as InvoiceExtraction;
+}
+
 const PROMPT = `You are an invoice data extraction system.
 Extract all data from this invoice document.
 
@@ -98,9 +147,12 @@ export async function extractInvoice(
     throw new ExtractionError("Extraction produced no data");
   }
 
+  let parsed: unknown;
   try {
-    return JSON.parse(responseText) as InvoiceExtraction;
+    parsed = JSON.parse(responseText);
   } catch {
     throw new ExtractionError("Extraction returned malformed data");
   }
+
+  return validateInvoiceExtraction(parsed);
 }
