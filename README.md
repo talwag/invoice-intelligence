@@ -124,8 +124,9 @@ volume. Full breakdown in [`COST.md`](./COST.md).
   Cloudflare's Next.js-on-Pages adapter (`next-on-pages`) is deprecated; the
   OpenNext Cloudflare adapter is the currently recommended path and supports
   the full Next.js feature set (SSR, ISR, middleware, `<Image>`).
-- **`extractor.py` / `schemas.py` (Pydantic validation) are a reference
-  implementation, not what runs in production.** Cloudflare Workers can't run
-  Python, so the deployed extraction path is `web/lib/extractor.ts`, which
-  parses Gemini's JSON response without a runtime schema-validation step
-  equivalent to Pydantic's.
+- **`extractor.py` / `schemas.py` are a reference implementation, not what runs
+  in production.** Cloudflare Workers can't run Python, so the deployed
+  extraction path is `web/lib/extractor.ts`. It has its own hand-written
+  runtime validation (`validateInvoiceExtraction`) mirroring what `schemas.py`'s
+  Pydantic model checks, rather than sharing the same schema definition — the
+  two are kept in sync by hand, not by a single shared source of truth.
