@@ -130,3 +130,6 @@ volume. Full breakdown in [`COST.md`](./COST.md).
   runtime validation (`validateInvoiceExtraction`) mirroring what `schemas.py`'s
   Pydantic model checks, rather than sharing the same schema definition — the
   two are kept in sync by hand, not by a single shared source of truth.
+- **No Provider Abstraction layer.** Both `extractor.py` and `extractor.ts` call
+  the Gemini SDK directly, with the model name hardcoded. Swapping AI providers
+  would mean editing code in both places, not changing a single env var.
