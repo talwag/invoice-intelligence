@@ -80,6 +80,13 @@ API_KEY=<any random string — this app's own REST auth secret>
 npm run dev        # http://localhost:3000 (or next free port)
 ```
 
+**Tests** (`web/lib/extractor.test.ts`, using Vitest — Gemini calls are mocked,
+so this runs fast with no API key, network access, or cost):
+
+```bash
+npm test
+```
+
 **Standalone Python extractor** (project root — a reference implementation, see
 note below):
 

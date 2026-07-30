@@ -15,6 +15,8 @@ API for external callers.
   of the deployed app.
 - Deploy: Cloudflare Workers, via the `@opennextjs/cloudflare` adapter (not Cloudflare
   Pages — the Next.js-on-Pages adapter is deprecated)
+- Testing: Vitest (`web/lib/extractor.test.ts`) — Gemini calls are mocked via
+  `vi.mock("@google/genai", ...)`, so tests run without real API calls, a key, or cost
 
 ## Project Structure
 - `/extractor.py`, `/schemas.py` — standalone Python reference implementation, not deployed
@@ -56,6 +58,9 @@ for external callers (curl, a CRM integration, etc.) only.
 - Hebrew text supported throughout (UI labels; `ensure_ascii=False` in the Python
   reference implementation)
 - `confidence < 0.7` triggers a warning banner in the UI
+- Changes to `web/lib/extractor.ts` should come with matching test updates in
+  `web/lib/extractor.test.ts` — that file mocks the Gemini call, so run `npm test`
+  before deploying, not just `tsc`
 
 ## Known deviations from the original assignment spec
 See [`README.md`](./README.md)'s "Known limitations" section for the full list
