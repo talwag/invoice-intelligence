@@ -3,6 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB
 const PDF_MAGIC_BYTES = Buffer.from("%PDF-");
 const MODEL = "gemini-2.5-flash";
+const GEMINI_TIMEOUT_MS = 15_000;
 
 export class ExtractionError extends Error {}
 
@@ -129,18 +130,32 @@ export async function extractInvoice(
   }
 
   let responseText: string | undefined;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
   try {
-    const response = await client.models.generateContent({
-      model: MODEL,
-      contents: [
-        { inlineData: { data: fileBytes.toString("base64"), mimeType } },
-        { text: PROMPT },
-      ],
-      config: { responseMimeType: "application/json" },
-    });
-    responseText = response.text;
-  } catch {
-    throw new ExtractionError("Extraction service is unavailable");
+    try {
+      const response = await client.models.generateContent({
+        model: MODEL,
+        contents: [
+          { inlineData: { data: fileBytes.toString("base64"), mimeType } },
+          { text: PROMPT },
+        ],
+        config: {
+          responseMimeType: "application/json",
+          abortSignal: controller.signal,
+        },
+      });
+      responseText = response.text;
+    } finally {
+      clearTimeout(timeout);
+    }
+  } catch (err) {
+    console.error("Gemini extraction call failed:", err);
+    throw new ExtractionError(
+      err instanceof Error && err.name === "AbortError"
+        ? `Extraction timed out after ${GEMINI_TIMEOUT_MS / 1000}s`
+        : "Extraction service is unavailable"
+    );
   }
 
   if (!responseText) {
@@ -150,7 +165,8 @@ export async function extractInvoice(
   let parsed: unknown;
   try {
     parsed = JSON.parse(responseText);
-  } catch {
+  } catch (err) {
+    console.error("Gemini response was not valid JSON:", err, responseText);
     throw new ExtractionError("Extraction returned malformed data");
   }
 
