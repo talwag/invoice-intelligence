@@ -14,6 +14,7 @@ import {
   extractInvoice,
   validateInvoiceExtraction,
   ExtractionError,
+  PROMPT,
 } from "./extractor";
 
 const validPayload = {
@@ -62,6 +63,16 @@ describe("validateInvoiceExtraction", () => {
     expect(() =>
       validateInvoiceExtraction({ ...validPayload, confidence: "high" })
     ).toThrow(/confidence/);
+  });
+});
+
+describe("PROMPT", () => {
+  it("tells the model to prefer the Hebrew vendor name when both appear", () => {
+    // Real invoices often print both a Hebrew legal name and an English
+    // trading name; without this instruction the same company can come
+    // back under two different names on different extraction runs, which
+    // breaks "breakdown by company" grouping.
+    expect(PROMPT).toContain("extract the Hebrew name");
   });
 });
 

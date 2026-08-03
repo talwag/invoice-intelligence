@@ -80,11 +80,13 @@ export function validateInvoiceExtraction(data: unknown): InvoiceExtraction {
   return d as unknown as InvoiceExtraction;
 }
 
-const PROMPT = `You are an invoice data extraction system.
+export const PROMPT = `You are an invoice data extraction system.
 Extract all data from this invoice document.
 
 Return a JSON object with exactly these fields:
-- vendor (string): company or person who issued the invoice
+- vendor (string): company or person who issued the invoice. If the name
+  appears in both Hebrew and English, extract the Hebrew name — always use
+  the same language for the same company so results are consistent.
 - vendor_id (string or null): Israeli business ID (ח.פ. or ע.מ.), null if not found
 - invoice_number (string or null): invoice number or reference ID
 - invoice_date (string or null): date the invoice was issued, format YYYY-MM-DD
