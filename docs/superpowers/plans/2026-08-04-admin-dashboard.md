@@ -593,7 +593,7 @@ git push -u origin worktree-admin-dashboard
 - Create: `web/app/DocumentsTab.tsx`
 
 **Interfaces:**
-- Consumes: `Document`, `SortColumn`, `SortDirection`, `formatILS` from `@/lib/dashboardAggregations`; `documentsToCsv`, `downloadCsv` from `@/lib/csvExport`.
+- Consumes: `Document`, `SortColumn`, `SortDirection`, `formatMonthLabel` from `@/lib/dashboardAggregations`; `documentsToCsv`, `downloadCsv` from `@/lib/csvExport`. (`formatILS` is not consumed here — the Documents table has no ILS-amount column by design, only Date/Company/Status/Confidence; totals live in the Summary tab, Task 5.)
 - Produces: `DocumentsTab` component with this prop shape (later consumed by Task 6):
 
 ```typescript
