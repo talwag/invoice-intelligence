@@ -6,6 +6,9 @@ import {
   sortDocuments,
   formatMonthLabel,
   formatILS,
+  getMonthlyTotals,
+  getCumulativeTotal,
+  getCompanyBreakdown,
 } from "./dashboardAggregations";
 import { makeDoc } from "./testFixtures";
 
@@ -97,5 +100,46 @@ describe("formatILS", () => {
   it("returns a dash for null or undefined", () => {
     expect(formatILS(null)).toBe("—");
     expect(formatILS(undefined)).toBe("—");
+  });
+});
+
+describe("getMonthlyTotals", () => {
+  it("sums totals per month for done documents only", () => {
+    const docs = [
+      makeDoc({ id: "1", created_at: "2026-07-01T00:00:00.000Z" }), // total 117
+      makeDoc({ id: "2", created_at: "2026-07-15T00:00:00.000Z" }), // total 117
+      makeDoc({ id: "3", created_at: "2026-06-01T00:00:00.000Z" }), // total 117
+      makeDoc({ id: "4", created_at: "2026-07-20T00:00:00.000Z", status: "processing", extracted_data: null }),
+    ];
+    expect(getMonthlyTotals(docs)).toEqual([
+      { month: "2026-07", total: 234 },
+      { month: "2026-06", total: 117 },
+    ]);
+  });
+});
+
+describe("getCumulativeTotal", () => {
+  it("sums totals across all done documents, excluding processing/failed", () => {
+    const docs = [
+      makeDoc({ id: "1" }), // 117
+      makeDoc({ id: "2" }), // 117
+      makeDoc({ id: "3", status: "failed", extracted_data: null }),
+    ];
+    expect(getCumulativeTotal(docs)).toBe(234);
+  });
+});
+
+describe("getCompanyBreakdown", () => {
+  it("groups totals by vendor, sorted descending by total", () => {
+    const docs = [
+      makeDoc({ id: "1", extracted_data: { ...makeDoc({ id: "x" }).extracted_data!, vendor: "Small Co", total: 50 } }),
+      makeDoc({ id: "2", extracted_data: { ...makeDoc({ id: "x" }).extracted_data!, vendor: "Big Co", total: 500 } }),
+      makeDoc({ id: "3", extracted_data: { ...makeDoc({ id: "x" }).extracted_data!, vendor: "Big Co", total: 300 } }),
+      makeDoc({ id: "4", status: "failed", extracted_data: null }),
+    ];
+    expect(getCompanyBreakdown(docs)).toEqual([
+      { company: "Big Co", total: 800 },
+      { company: "Small Co", total: 50 },
+    ]);
   });
 });

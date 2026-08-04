@@ -91,3 +91,45 @@ export function formatILS(value: number | null | undefined): string {
   if (value === null || value === undefined) return "—";
   return `₪${value.toFixed(2)}`;
 }
+
+export interface MonthlyTotal {
+  month: string;
+  total: number;
+}
+
+export function getMonthlyTotals(documents: Document[]): MonthlyTotal[] {
+  const totals = new Map<string, number>();
+  for (const doc of documents) {
+    if (doc.status !== "done" || !doc.extracted_data) continue;
+    const month = doc.created_at.slice(0, 7);
+    totals.set(month, (totals.get(month) ?? 0) + doc.extracted_data.total);
+  }
+  return Array.from(totals.entries())
+    .map(([month, total]) => ({ month, total }))
+    .sort((a, b) => b.month.localeCompare(a.month));
+}
+
+export function getCumulativeTotal(documents: Document[]): number {
+  return documents
+    .filter((d): d is Document & { extracted_data: ExtractedData } =>
+      d.status === "done" && d.extracted_data !== null
+    )
+    .reduce((sum, d) => sum + d.extracted_data.total, 0);
+}
+
+export interface CompanyBreakdown {
+  company: string;
+  total: number;
+}
+
+export function getCompanyBreakdown(documents: Document[]): CompanyBreakdown[] {
+  const totals = new Map<string, number>();
+  for (const doc of documents) {
+    if (doc.status !== "done" || !doc.extracted_data) continue;
+    const vendor = doc.extracted_data.vendor;
+    totals.set(vendor, (totals.get(vendor) ?? 0) + doc.extracted_data.total);
+  }
+  return Array.from(totals.entries())
+    .map(([company, total]) => ({ company, total }))
+    .sort((a, b) => b.total - a.total);
+}
