@@ -43,11 +43,23 @@ for external callers (curl, a CRM integration, etc.) only.
 
 ## Dashboard Requirements
 1. Upload button at top (file picker, PDF only), shows a spinner while processing
-2. Documents table columns: filename, date, status badge, confidence badge
-   - Confidence badge: green if >= 0.8, yellow if 0.6-0.79, red if < 0.6
-3. Click any row: side panel showing vendor, business ID, dates, line items, VAT
-   breakdown, and total, with Hebrew labels
-4. Warning banner in the side panel if confidence < 0.7
+2. Two tabs: "מסמכים" (Documents) and "סיכום" (Summary)
+3. Documents tab:
+   - Month filter, company filter (both derived from the actual data, not hardcoded)
+   - Table columns: filename, date, company, status badge, confidence badge
+     - Confidence badge: green if >= 0.8, yellow if 0.6-0.79, red if < 0.6
+   - Date and Company columns are sortable (click header, click again to reverse)
+   - "ייצוא ל-CSV" exports the currently filtered/sorted rows as a CSV file
+     (client-side, no server round-trip, no new dependency)
+4. Summary tab: cumulative total, monthly totals, and a company breakdown —
+   always across *all* documents, independent of the Documents tab's filters
+   (see docs/superpowers/specs/2026-08-04-admin-dashboard-design.md for why)
+5. Click any row in the Documents table: side panel showing vendor, business ID,
+   dates, line items, VAT breakdown, and total, with Hebrew labels
+6. Warning banner in the side panel if confidence < 0.7
+7. Filtering/sorting/aggregation logic lives in web/lib/dashboardAggregations.ts
+   (pure functions, unit-tested) — DocumentsTab.tsx and SummaryTab.tsx render,
+   they don't re-derive
 
 ## Conventions
 - Gemini calls for the deployed app go through `web/lib/extractor.ts` only —
