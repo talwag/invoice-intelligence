@@ -52,8 +52,9 @@ for external callers (curl, a CRM integration, etc.) only.
    - "ייצוא ל-CSV" exports the currently filtered/sorted rows as a CSV file
      (client-side, no server round-trip, no new dependency)
 4. Summary tab: cumulative total, monthly totals, and a company breakdown —
-   always across *all* documents, independent of the Documents tab's filters
-   (see docs/superpowers/specs/2026-08-04-admin-dashboard-design.md for why)
+   always across all documents with extracted data (processing/failed documents are
+   excluded from these totals but still appear in the Documents tab), independent
+   of the Documents tab's filters (see docs/superpowers/specs/2026-08-04-admin-dashboard-design.md for why)
 5. Click any row in the Documents table: side panel showing vendor, business ID,
    dates, line items, VAT breakdown, and total, with Hebrew labels
 6. Warning banner in the side panel if confidence < 0.7
