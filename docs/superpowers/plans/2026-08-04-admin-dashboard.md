@@ -1426,7 +1426,7 @@ npm run cf:deploy
 - [ ] **Step 3: Verify live**
 
 ```bash
-curl -sk https://your-deployment.workers.dev/ -o /tmp/verify.html
+curl -sk <your-deployment-url>/ -o /tmp/verify.html
 grep -o "<title>.*</title>" /tmp/verify.html
 rm -f /tmp/verify.html
 ```

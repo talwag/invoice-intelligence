@@ -412,10 +412,10 @@ npm run cf:deploy
 - [ ] **Step 3: Verify live**
 
 ```bash
-curl -sk https://your-deployment.workers.dev/ -o /tmp/verify-root.html
+curl -sk <your-deployment-url>/ -o /tmp/verify-root.html
 grep -o "Turn invoice PDFs into structured data in seconds" /tmp/verify-root.html
 
-curl -sk https://your-deployment.workers.dev/app -o /tmp/verify-app.html
+curl -sk <your-deployment-url>/app -o /tmp/verify-app.html
 grep -o "Documents<\|Summary<" /tmp/verify-app.html
 ```
 
