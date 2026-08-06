@@ -3,9 +3,6 @@
 Upload an invoice PDF, get back structured JSON (vendor, line items, VAT, totals, a
 confidence score) in seconds — via a small Next.js dashboard and a REST API.
 
-**Live:** https://your-deployment.workers.dev
-**Dashboard:** https://your-deployment.workers.dev/app
-
 ## What it does
 
 `/` is a static marketing landing page; the dashboard itself lives at `/app`.
@@ -53,8 +50,8 @@ use this — it fetches Supabase directly from a Server Component, so the key ne
 reaches the browser. This header is for external callers.
 
 ```bash
-curl -H "X-API-Key: $API_KEY" https://your-deployment.workers.dev/api/documents
-curl -H "X-API-Key: $API_KEY" https://your-deployment.workers.dev/api/documents/<id>
+curl -H "X-API-Key: $API_KEY" <your-deployment-url>/api/documents
+curl -H "X-API-Key: $API_KEY" <your-deployment-url>/api/documents/<id>
 ```
 
 `POST /api/upload` takes a `multipart/form-data` body with a `file` field (PDF
@@ -78,6 +75,25 @@ SUPABASE_SERVICE_ROLE_KEY=<Supabase service role key>
 GEMINI_API_KEY=<Gemini Developer API key, from aistudio.google.com>
 API_KEY=<any random string — this app's own REST auth secret>
 ```
+
+To run this project yourself, you'll need your own Supabase project and Gemini
+API key:
+
+- **Supabase** — create a free project at [supabase.com](https://supabase.com).
+  - `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are both on the
+    project's **Settings → API** page (the service role key, not the
+    anon/public key — this app uses it server-side only, so it never reaches
+    the browser).
+  - Create a `documents` table (columns: `id`, `filename`, `status`,
+    `confidence`, `extracted_data`, `created_at`, plus whatever your schema
+    needs) and a Storage bucket for the uploaded PDFs — this app reads/writes
+    both.
+- **Gemini** — create a free API key at
+  [aistudio.google.com](https://aistudio.google.com/app/apikey) and use it for
+  `GEMINI_API_KEY`. The Developer API's free tier is enough for local testing.
+- **API_KEY** — any random string you pick yourself; it's just the shared
+  secret this app checks on its own `/api/documents` routes, unrelated to
+  either provider.
 
 ```bash
 npm run dev        # http://localhost:3000 (or next free port)
