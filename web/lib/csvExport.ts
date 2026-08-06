@@ -29,7 +29,10 @@ export function documentsToCsv(documents: Document[]): string {
 }
 
 export function downloadCsv(csvContent: string, filename: string): void {
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  // Prepend a UTF-8 BOM so Excel reliably detects the encoding instead of
+  // guessing (and mangling Hebrew vendor/company names). This is a
+  // presentation/download concern, so it belongs here, not in documentsToCsv.
+  const blob = new Blob(["﻿" + csvContent], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;

@@ -58,4 +58,27 @@ describe("downloadCsv", () => {
     expect(clickSpy).toHaveBeenCalledOnce();
     expect(revokeObjectURL).toHaveBeenCalledWith("blob:fake-url");
   });
+
+  it("prefixes the Blob content with a UTF-8 BOM so Excel doesn't mangle Hebrew text", () => {
+    let blobParts: BlobPart[] = [];
+    class FakeBlob {
+      constructor(parts: BlobPart[]) {
+        blobParts = parts;
+      }
+    }
+    vi.stubGlobal("Blob", FakeBlob);
+    vi.stubGlobal("URL", {
+      createObjectURL: vi.fn().mockReturnValue("blob:fake-url"),
+      revokeObjectURL: vi.fn(),
+    });
+    const fakeLink = { href: "", download: "", click: vi.fn() } as unknown as HTMLAnchorElement;
+    vi.spyOn(document, "createElement").mockReturnValue(fakeLink);
+
+    downloadCsv("a,b\n1,2", "export.csv");
+
+    expect(blobParts).toHaveLength(1);
+    const content = blobParts[0] as string;
+    expect(content.charCodeAt(0)).toBe(0xfeff);
+    expect(content).toBe("﻿a,b\n1,2");
+  });
 });
