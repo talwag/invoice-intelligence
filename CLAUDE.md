@@ -31,8 +31,18 @@ API for external callers.
   (requires `X-API-Key` header)
 - `/web/app/page.tsx` — Server Component: fetches documents directly via Supabase,
   server-side, no API key involved
-- `/web/app/DashboardClient.tsx` — the interactive dashboard UI (upload button, table,
-  detail panel)
+- `/web/app/DashboardClient.tsx` — owns tab/filter/sort state and the upload flow;
+  composes `DocumentsTab`/`SummaryTab` and renders the row detail side panel
+- `/web/app/DocumentsTab.tsx` — Documents tab UI: filters, sortable table, CSV export
+  button
+- `/web/app/SummaryTab.tsx` — Summary tab UI: cumulative total, monthly totals, company
+  breakdown
+- `/web/lib/dashboardAggregations.ts` — pure, unit-tested filtering/sorting/aggregation
+  functions; source of truth for the totals and lists both tabs render
+- `/web/lib/csvExport.ts` — builds the CSV string and triggers the client-side download
+  for "ייצוא ל-CSV"
+- `/web/lib/testFixtures.ts` — shared `makeDoc()` test fixture used across the lib unit
+  tests
 
 ## API Authentication
 `/api/documents` and `/api/documents/[id]` require header: `X-API-Key: {API_KEY}`.
@@ -43,11 +53,24 @@ for external callers (curl, a CRM integration, etc.) only.
 
 ## Dashboard Requirements
 1. Upload button at top (file picker, PDF only), shows a spinner while processing
-2. Documents table columns: filename, date, status badge, confidence badge
-   - Confidence badge: green if >= 0.8, yellow if 0.6-0.79, red if < 0.6
-3. Click any row: side panel showing vendor, business ID, dates, line items, VAT
-   breakdown, and total, with Hebrew labels
-4. Warning banner in the side panel if confidence < 0.7
+2. Two tabs: "מסמכים" (Documents) and "סיכום" (Summary)
+3. Documents tab:
+   - Month filter, company filter (both derived from the actual data, not hardcoded)
+   - Table columns: filename, date, company, status badge, confidence badge
+     - Confidence badge: green if >= 0.8, yellow if 0.6-0.79, red if < 0.6
+   - Date and Company columns are sortable (click header, click again to reverse)
+   - "ייצוא ל-CSV" exports the currently filtered/sorted rows as a CSV file
+     (client-side, no server round-trip, no new dependency)
+4. Summary tab: cumulative total, monthly totals, and a company breakdown —
+   always across all documents with extracted data (processing/failed documents are
+   excluded from these totals but still appear in the Documents tab), independent
+   of the Documents tab's filters (see docs/superpowers/specs/2026-08-04-admin-dashboard-design.md for why)
+5. Click any row in the Documents table: side panel showing vendor, business ID,
+   dates, line items, VAT breakdown, and total, with Hebrew labels
+6. Warning banner in the side panel if confidence < 0.7
+7. Filtering/sorting/aggregation logic lives in web/lib/dashboardAggregations.ts
+   (pure functions, unit-tested) — DocumentsTab.tsx and SummaryTab.tsx render,
+   they don't re-derive
 
 ## Conventions
 - Gemini calls for the deployed app go through `web/lib/extractor.ts` only —

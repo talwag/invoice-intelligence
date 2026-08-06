@@ -15,7 +15,7 @@
 - Sortable columns are **Date and Company only** — not every column (see spec's ambiguity fix).
 - Summary tab always shows the full picture across all months/companies, independent of the Documents tab's active filters (judgment call #1 in the spec).
 - Documents with `status !== "done"` (no `extracted_data`) are excluded from all Summary aggregates, but still shown normally in the Documents table (judgment call #2 in the spec).
-- Follow this project's established conventions from earlier work: explain each change in the commit message (why, not just what), commit and push after each verified task, check `README.md`/`CLAUDE.md` for staleness after a change that could affect them, and write real Vitest tests matching the style already in `web/lib/extractor.test.ts` (`vi.hoisted`/`vi.mock` pattern where mocking is needed, `describe`/`it`/`expect`).
+- Follow this project's established conventions from earlier work: explain each change in the commit message (why, not just what), commit and push after each verified task (to the feature branch created for this plan — **not** `master`; `master` only gets this work via the merge at the end of the whole-branch review), check `README.md`/`CLAUDE.md` for staleness after a change that could affect them, and write real Vitest tests matching the style already in `web/lib/extractor.test.ts` (`vi.hoisted`/`vi.mock` pattern where mocking is needed, `describe`/`it`/`expect`).
 - UI copy: this app already mixes Hebrew (data labels, table headers, messages) and English (branding, action buttons like "Upload PDF"). New Hebrew labels used in this plan: tabs "מסמכים" (Documents) / "סיכום" (Summary); month filter "חודש" with "כל החודשים" (all months) as the no-filter option; company filter "חברה" with "כל החברות" (all companies); export button "ייצוא ל-CSV"; new table column "חברה" (Company).
 
 ---
@@ -24,28 +24,20 @@
 
 **Files:**
 - Create: `web/lib/dashboardAggregations.ts`
+- Create: `web/lib/testFixtures.ts` (shared `makeDoc` test helper — Task 3's test file reuses this instead of redefining it, so the same fixture isn't duplicated verbatim across two test files)
 - Test: `web/lib/dashboardAggregations.test.ts`
 
 **Interfaces:**
-- Produces: `InvoiceItem`, `ExtractedData`, `Document` (moved from `DashboardClient.tsx` — that file still has its own copy until Task 6, which is fine, TypeScript doesn't complain about two structurally-identical interfaces living in two files), `DocumentFilters`, `SortColumn`, `SortDirection`, `getMonthOptions(documents: Document[]): string[]`, `getCompanyOptions(documents: Document[]): string[]`, `filterDocuments(documents: Document[], filters: DocumentFilters): Document[]`, `sortDocuments(documents: Document[], sortBy: SortColumn, direction: SortDirection): Document[]`, `formatMonthLabel(month: string): string`, `formatILS(value: number | null | undefined): string`.
+- Produces: `InvoiceItem`, `ExtractedData`, `Document` (moved from `DashboardClient.tsx` — that file still has its own copy until Task 6, which is fine, TypeScript doesn't complain about two structurally-identical interfaces living in two files), `DocumentFilters`, `SortColumn`, `SortDirection`, `getMonthOptions(documents: Document[]): string[]`, `getCompanyOptions(documents: Document[]): string[]`, `filterDocuments(documents: Document[], filters: DocumentFilters): Document[]`, `sortDocuments(documents: Document[], sortBy: SortColumn, direction: SortDirection): Document[]`, `formatMonthLabel(month: string): string`, `formatILS(value: number | null | undefined): string`. Also produces `makeDoc(overrides: Partial<Document> & { id: string }): Document` from `web/lib/testFixtures.ts` — a test-only helper, not part of the app's runtime code, but a named interface later tasks' tests rely on.
 
 - [ ] **Step 1: Write the failing test**
 
-Create `web/lib/dashboardAggregations.test.ts`:
+Create `web/lib/testFixtures.ts` (test-only fixture helper, not application code):
 
 ```typescript
-import { describe, it, expect } from "vitest";
-import {
-  getMonthOptions,
-  getCompanyOptions,
-  filterDocuments,
-  sortDocuments,
-  formatMonthLabel,
-  formatILS,
-  type Document,
-} from "./dashboardAggregations";
+import type { Document } from "./dashboardAggregations";
 
-function makeDoc(overrides: Partial<Document> & { id: string }): Document {
+export function makeDoc(overrides: Partial<Document> & { id: string }): Document {
   return {
     filename: "invoice.pdf",
     status: "done",
@@ -68,6 +60,23 @@ function makeDoc(overrides: Partial<Document> & { id: string }): Document {
     ...overrides,
   };
 }
+```
+
+This has no test of its own (it's a fixture, not logic) — Task 1's own tests below exercise it indirectly by using it. If `npx tsc --noEmit` passes with this file in place, that's the check for this specific step.
+
+Create `web/lib/dashboardAggregations.test.ts`:
+
+```typescript
+import { describe, it, expect } from "vitest";
+import {
+  getMonthOptions,
+  getCompanyOptions,
+  filterDocuments,
+  sortDocuments,
+  formatMonthLabel,
+  formatILS,
+} from "./dashboardAggregations";
+import { makeDoc } from "./testFixtures";
 
 describe("getMonthOptions", () => {
   it("returns distinct months, newest first", () => {
@@ -280,7 +289,7 @@ Temporarily change `direction === "asc" ? cmp : -cmp` to always `cmp` (remove th
 ```bash
 cd web
 npx tsc --noEmit
-git add lib/dashboardAggregations.ts lib/dashboardAggregations.test.ts
+git add lib/dashboardAggregations.ts lib/testFixtures.ts lib/dashboardAggregations.test.ts
 git commit -m "feat: add month/company filtering and sorting for the dashboard
 
 New web/lib/dashboardAggregations.ts holds the Document/ExtractedData
@@ -289,7 +298,7 @@ filtering/sorting documents client-side, per the admin dashboard
 design (docs/superpowers/specs/2026-08-04-admin-dashboard-design.md).
 Aggregation (monthly totals, cumulative, company breakdown) is a
 separate follow-up task."
-git push origin master
+git push -u origin worktree-admin-dashboard
 ```
 
 ---
@@ -423,7 +432,7 @@ git commit -m "feat: add monthly totals, cumulative total, and company breakdown
 Completes the dashboardAggregations module. All three exclude
 processing/failed documents (no extracted_data to aggregate) per
 judgment call #2 in the design spec."
-git push origin master
+git push -u origin worktree-admin-dashboard
 ```
 
 ---
@@ -435,7 +444,7 @@ git push origin master
 - Test: `web/lib/csvExport.test.ts`
 
 **Interfaces:**
-- Consumes: `Document` from `web/lib/dashboardAggregations.ts` (Task 1).
+- Consumes: `Document` from `web/lib/dashboardAggregations.ts` (Task 1); `makeDoc` from `web/lib/testFixtures.ts` (Task 1, test-only).
 - Produces: `documentsToCsv(documents: Document[]): string`, `downloadCsv(csvContent: string, filename: string): void`.
 
 - [ ] **Step 1: Write the failing test**
@@ -445,31 +454,7 @@ Create `web/lib/csvExport.test.ts`:
 ```typescript
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { documentsToCsv, downloadCsv } from "./csvExport";
-import type { Document } from "./dashboardAggregations";
-
-function makeDoc(overrides: Partial<Document> & { id: string }): Document {
-  return {
-    filename: "invoice.pdf",
-    status: "done",
-    confidence: 0.95,
-    created_at: "2026-07-15T10:00:00.000Z",
-    extracted_data: {
-      vendor: "Acme Ltd",
-      vendor_id: null,
-      invoice_number: "INV-1",
-      invoice_date: "2026-07-15",
-      due_date: null,
-      items: [],
-      subtotal: 100,
-      vat_rate: 0.17,
-      vat_amount: 17,
-      total: 117,
-      currency: "ILS",
-      confidence: 0.95,
-    },
-    ...overrides,
-  };
-}
+import { makeDoc } from "./testFixtures";
 
 describe("documentsToCsv", () => {
   it("produces a header row plus one row per document", () => {
@@ -597,7 +582,7 @@ git commit -m "feat: add client-side CSV export
 documentsToCsv() and downloadCsv() — no new dependency (a Blob and
 a temporary <a download> link), matching the design spec's choice
 of CSV over a real .xlsx library."
-git push origin master
+git push -u origin worktree-admin-dashboard
 ```
 
 ---
@@ -608,7 +593,7 @@ git push origin master
 - Create: `web/app/DocumentsTab.tsx`
 
 **Interfaces:**
-- Consumes: `Document`, `SortColumn`, `SortDirection`, `formatILS` from `@/lib/dashboardAggregations`; `documentsToCsv`, `downloadCsv` from `@/lib/csvExport`.
+- Consumes: `Document`, `SortColumn`, `SortDirection`, `formatMonthLabel` from `@/lib/dashboardAggregations`; `documentsToCsv`, `downloadCsv` from `@/lib/csvExport`. (`formatILS` is not consumed here — the Documents table has no ILS-amount column by design, only Date/Company/Status/Confidence; totals live in the Summary tab, Task 5.)
 - Produces: `DocumentsTab` component with this prop shape (later consumed by Task 6):
 
 ```typescript
@@ -854,7 +839,7 @@ Toolbar (month filter, company filter, CSV export) + the documents
 table, moved out of DashboardClient.tsx. Receives already-filtered
 and already-sorted documents — no filtering/sorting logic lives
 here, per the design spec."
-git push origin master
+git push -u origin worktree-admin-dashboard
 ```
 
 ---
@@ -969,7 +954,7 @@ Cumulative total, monthly totals, and company breakdown. Always
 receives the full unfiltered document list — independent of
 whatever filter is active on the Documents tab (judgment call #1
 in the design spec)."
-git push origin master
+git push -u origin worktree-admin-dashboard
 ```
 
 ---
@@ -1354,7 +1339,7 @@ filters work, Date/Company column sort toggles direction, CSV
 export downloads a working file, Summary stays independent of
 Documents-tab filters, upload and the side panel still work
 unchanged."
-git push origin master
+git push -u origin worktree-admin-dashboard
 ```
 
 ---
@@ -1411,7 +1396,7 @@ git commit -m "docs: update CLAUDE.md's Dashboard Requirements for the new tabs
 Was still describing the single-table dashboard from before this
 feature (issue #6) — tabs, filtering, sorting, and export didn't
 exist when it was last written."
-git push origin master
+git push -u origin worktree-admin-dashboard
 ```
 
 ---
@@ -1419,6 +1404,12 @@ git push origin master
 ### Task 8: Deploy
 
 **Files:** none (deploy only)
+
+**This task does not run in the worktree, and not through the subagent task
+loop.** It runs from `master`, after the branch from Tasks 1-7 has passed
+final review and been merged (`superpowers:finishing-a-development-branch`).
+Deploying from the worktree branch would put unreviewed code live before
+the merge decision is even made.
 
 - [ ] **Step 1: Ask before deploying**
 

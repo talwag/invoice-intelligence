@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
-import DashboardClient, { type Document } from "./DashboardClient";
+import DashboardClient from "./DashboardClient";
+import type { Document } from "@/lib/dashboardAggregations";
 
 // This page reads Supabase directly on the server, so the dashboard never
 // needs the REST API's X-API-Key — that stays private, for external callers
