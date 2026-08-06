@@ -60,6 +60,18 @@ describe("documentsToCsv", () => {
     const csv = documentsToCsv([makeDoc({ id: "1", filename: "invoice.pdf" })]);
     expect(csv.split("\n")[1]).toBe("invoice.pdf,2026-07-15,Acme Ltd,done,95%,117.00");
   });
+
+  it("applies both the injection guard and comma/quote escaping when a field needs both", () => {
+    const csv = documentsToCsv([
+      makeDoc({
+        id: "1",
+        extracted_data: { ...makeDoc({ id: "x" }).extracted_data!, vendor: '=foo,"bar"' },
+      }),
+    ]);
+    // guard prefixes with ' first, then the comma/quote escaping wraps and
+    // doubles embedded quotes around the already-guarded value
+    expect(csv.split("\n")[1]).toContain('"\'=foo,""bar"""');
+  });
 });
 
 describe("downloadCsv", () => {
