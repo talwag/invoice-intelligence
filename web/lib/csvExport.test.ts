@@ -34,6 +34,32 @@ describe("documentsToCsv", () => {
   it("returns just the header row for an empty list", () => {
     expect(documentsToCsv([])).toBe("Filename,Date,Company,Status,Confidence,Total");
   });
+
+  it.each(["=", "+", "-", "@"])(
+    "prefixes a filename starting with '%s' with a single quote to prevent formula injection",
+    (prefix) => {
+      const csv = documentsToCsv([makeDoc({ id: "1", filename: `${prefix}HYPERLINK(evil.com)` })]);
+      expect(csv.split("\n")[1]).toContain(`'${prefix}HYPERLINK(evil.com)`);
+    }
+  );
+
+  it.each(["=", "+", "-", "@"])(
+    "prefixes a company/vendor name starting with '%s' with a single quote to prevent formula injection",
+    (prefix) => {
+      const csv = documentsToCsv([
+        makeDoc({
+          id: "1",
+          extracted_data: { ...makeDoc({ id: "x" }).extracted_data!, vendor: `${prefix}cmd|calc!A1` },
+        }),
+      ]);
+      expect(csv.split("\n")[1]).toContain(`'${prefix}cmd|calc!A1`);
+    }
+  );
+
+  it("leaves a normal field (not starting with =, +, -, or @) unaffected", () => {
+    const csv = documentsToCsv([makeDoc({ id: "1", filename: "invoice.pdf" })]);
+    expect(csv.split("\n")[1]).toBe("invoice.pdf,2026-07-15,Acme Ltd,done,95%,117.00");
+  });
 });
 
 describe("downloadCsv", () => {

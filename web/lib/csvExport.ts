@@ -3,10 +3,17 @@ import type { Document } from "./dashboardAggregations";
 const CSV_HEADERS = ["Filename", "Date", "Company", "Status", "Confidence", "Total"];
 
 function escapeCsvField(value: string): string {
-  if (value.includes(",") || value.includes('"') || value.includes("\n")) {
-    return `"${value.replace(/"/g, '""')}"`;
+  // Neutralize CSV/formula injection: a leading '=', '+', '-', or '@' can be
+  // interpreted as a formula by some spreadsheet apps when the file is
+  // opened. Prefixing with a single quote forces the cell to be read as
+  // text (the standard OWASP-recommended mitigation). filename is raw
+  // user-uploaded input and company is Gemini-extracted from PDF content,
+  // so neither is trustworthy here.
+  const guarded = /^[=+\-@]/.test(value) ? `'${value}` : value;
+  if (guarded.includes(",") || guarded.includes('"') || guarded.includes("\n")) {
+    return `"${guarded.replace(/"/g, '""')}"`;
   }
-  return value;
+  return guarded;
 }
 
 export function documentsToCsv(documents: Document[]): string {
