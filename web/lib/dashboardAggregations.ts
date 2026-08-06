@@ -74,15 +74,10 @@ export function sortDocuments(
   return sorted;
 }
 
-const HEBREW_MONTH_NAMES = [
-  "ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני",
-  "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר",
-];
-
 export function formatMonthLabel(month: string): string {
   const [year, monthNum] = month.split("-");
-  const name = HEBREW_MONTH_NAMES[Number(monthNum) - 1];
-  return `${name} ${year}`;
+  const date = new Date(Number(year), Number(monthNum) - 1, 1);
+  return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 }
 
 export function formatILS(value: number | null | undefined): string {

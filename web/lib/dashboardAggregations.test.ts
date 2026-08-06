@@ -87,8 +87,8 @@ describe("sortDocuments", () => {
 });
 
 describe("formatMonthLabel", () => {
-  it("formats a YYYY-MM string as a Hebrew month/year label", () => {
-    expect(formatMonthLabel("2026-07")).toBe("יולי 2026");
+  it("formats a YYYY-MM string as an English month/year label", () => {
+    expect(formatMonthLabel("2026-07")).toBe("July 2026");
   });
 });
 

@@ -107,7 +107,7 @@ export default function DocumentsTab({
           onChange={(e) => onMonthChange(e.target.value || null)}
           className="rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-800 dark:bg-zinc-950"
         >
-          <option value="">כל החודשים</option>
+          <option value="">All months</option>
           {monthOptions.map((month) => (
             <option key={month} value={month}>
               {formatMonthLabel(month)}
@@ -120,7 +120,7 @@ export default function DocumentsTab({
           onChange={(e) => onCompanyChange(e.target.value || null)}
           className="rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-800 dark:bg-zinc-950"
         >
-          <option value="">כל החברות</option>
+          <option value="">All companies</option>
           {companyOptions.map((company) => (
             <option key={company} value={company}>
               {company}
@@ -132,29 +132,29 @@ export default function DocumentsTab({
           onClick={handleExport}
           className="ml-auto rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
         >
-          ייצוא ל-CSV
+          Export to CSV
         </button>
       </div>
 
       <table className="w-full text-sm">
         <thead className="bg-zinc-100 text-left text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
           <tr>
-            <th className="px-4 py-3 font-medium">שם קובץ</th>
+            <th className="px-4 py-3 font-medium">Filename</th>
             <SortableHeader
-              label="תאריך"
+              label="Date"
               column="date"
               sortBy={sortBy}
               sortDirection={sortDirection}
               onSortChange={onSortChange}
             />
             <SortableHeader
-              label="חברה"
+              label="Company"
               column="company"
               sortBy={sortBy}
               sortDirection={sortDirection}
               onSortChange={onSortChange}
             />
-            <th className="px-4 py-3 font-medium">סטטוס</th>
+            <th className="px-4 py-3 font-medium">Status</th>
             <th className="px-4 py-3 font-medium">Confidence</th>
           </tr>
         </thead>
@@ -162,13 +162,13 @@ export default function DocumentsTab({
           {isRefreshing ? (
             <tr>
               <td colSpan={5} className="px-4 py-8 text-center text-zinc-400">
-                מרענן...
+                Refreshing...
               </td>
             </tr>
           ) : documents.length === 0 ? (
             <tr>
               <td colSpan={5} className="px-4 py-8 text-center text-zinc-400">
-                אין מסמכים תואמים
+                No matching documents
               </td>
             </tr>
           ) : (
@@ -180,7 +180,7 @@ export default function DocumentsTab({
               >
                 <td className="px-4 py-3 text-zinc-900 dark:text-zinc-100">{doc.filename}</td>
                 <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
-                  {new Date(doc.created_at).toLocaleDateString("he-IL")}
+                  {new Date(doc.created_at).toLocaleDateString("en-US")}
                 </td>
                 <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
                   {doc.extracted_data?.vendor ?? "—"}

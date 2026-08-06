@@ -40,7 +40,7 @@ API for external callers.
 - `/web/lib/dashboardAggregations.ts` — pure, unit-tested filtering/sorting/aggregation
   functions; source of truth for the totals and lists both tabs render
 - `/web/lib/csvExport.ts` — builds the CSV string and triggers the client-side download
-  for "ייצוא ל-CSV"
+  for the "Export to CSV" button
 - `/web/lib/testFixtures.ts` — shared `makeDoc()` test fixture used across the lib unit
   tests
 
@@ -53,20 +53,20 @@ for external callers (curl, a CRM integration, etc.) only.
 
 ## Dashboard Requirements
 1. Upload button at top (file picker, PDF only), shows a spinner while processing
-2. Two tabs: "מסמכים" (Documents) and "סיכום" (Summary)
+2. Two tabs: Documents and Summary
 3. Documents tab:
    - Month filter, company filter (both derived from the actual data, not hardcoded)
    - Table columns: filename, date, company, status badge, confidence badge
      - Confidence badge: green if >= 0.8, yellow if 0.6-0.79, red if < 0.6
    - Date and Company columns are sortable (click header, click again to reverse)
-   - "ייצוא ל-CSV" exports the currently filtered/sorted rows as a CSV file
+   - "Export to CSV" exports the currently filtered/sorted rows as a CSV file
      (client-side, no server round-trip, no new dependency)
 4. Summary tab: cumulative total, monthly totals, and a company breakdown —
    always across all documents with extracted data (processing/failed documents are
    excluded from these totals but still appear in the Documents tab), independent
    of the Documents tab's filters (see docs/superpowers/specs/2026-08-04-admin-dashboard-design.md for why)
 5. Click any row in the Documents table: side panel showing vendor, business ID,
-   dates, line items, VAT breakdown, and total, with Hebrew labels
+   dates, line items, VAT breakdown, and total, with English labels
 6. Warning banner in the side panel if confidence < 0.7
 7. Filtering/sorting/aggregation logic lives in web/lib/dashboardAggregations.ts
    (pure functions, unit-tested) — DocumentsTab.tsx and SummaryTab.tsx render,
@@ -78,8 +78,11 @@ for external callers (curl, a CRM integration, etc.) only.
   shared dependency the web app calls into
 - All database access via the Supabase JS client (`web/lib/supabase.ts`)
 - Monetary values formatted with the ₪ symbol
-- Hebrew text supported throughout (UI labels; `ensure_ascii=False` in the Python
-  reference implementation)
+- UI labels are English throughout. Hebrew appears only in extracted *data* (e.g.
+  vendor names — `extractor.ts`'s prompt standardizes on Hebrew when an invoice shows
+  both languages, see the extraction prompt for why), never in hardcoded app text.
+  `ensure_ascii=False` in the Python reference implementation keeps that Hebrew data
+  readable in its own output.
 - `confidence < 0.7` triggers a warning banner in the UI
 - Changes to `web/lib/extractor.ts` should come with matching test updates in
   `web/lib/extractor.test.ts` — that file mocks the Gemini call, so run `npm test`

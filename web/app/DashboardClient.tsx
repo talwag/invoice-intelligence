@@ -67,7 +67,7 @@ export default function DashboardClient({
     if (!file) return;
 
     if (file.type !== "application/pdf") {
-      setUploadMessage({ type: "error", text: "רק קבצי PDF נתמכים" });
+      setUploadMessage({ type: "error", text: "Only PDF files are supported" });
       return;
     }
 
@@ -81,15 +81,15 @@ export default function DashboardClient({
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result.error ?? "העלאה נכשלה");
+        throw new Error(result.error ?? "Upload failed");
       }
 
-      setUploadMessage({ type: "success", text: `הקובץ ${file.name} עובד בהצלחה` });
+      setUploadMessage({ type: "success", text: `${file.name} uploaded successfully` });
       startTransition(() => router.refresh());
     } catch (err) {
       setUploadMessage({
         type: "error",
-        text: err instanceof Error ? err.message : "העלאה נכשלה",
+        text: err instanceof Error ? err.message : "Upload failed",
       });
     } finally {
       setUploading(false);
@@ -120,7 +120,7 @@ export default function DashboardClient({
               {uploading && (
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white dark:border-zinc-900/40 dark:border-t-zinc-900" />
               )}
-              {uploading ? "מעבד..." : "Upload PDF"}
+              {uploading ? "Processing..." : "Upload PDF"}
             </button>
           </div>
         </div>
@@ -146,7 +146,7 @@ export default function DashboardClient({
                 : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
             }`}
           >
-            מסמכים
+            Documents
           </button>
           <button
             onClick={() => setActiveTab("summary")}
@@ -156,7 +156,7 @@ export default function DashboardClient({
                 : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
             }`}
           >
-            סיכום
+            Summary
           </button>
         </div>
 
@@ -216,35 +216,35 @@ function DocumentPanel({
         {!data ? (
           <p className="mt-6 text-sm text-zinc-500">
             {document.status === "processing"
-              ? "המסמך עדיין בעיבוד..."
-              : "לא נמצאו נתונים מחולצים"}
+              ? "This document is still processing..."
+              : "No extracted data found"}
           </p>
         ) : (
           <div className="mt-6 space-y-4 text-sm">
             {data.confidence < 0.7 && (
               <div className="rounded-lg bg-yellow-50 px-4 py-3 text-yellow-800">
-                ⚠ רמת ביטחון נמוכה בחילוץ הנתונים (
-                {(data.confidence * 100).toFixed(0)}%) — יש לבדוק ידנית
+                ⚠ Low extraction confidence (
+                {(data.confidence * 100).toFixed(0)}%) — manual review recommended
               </div>
             )}
 
             <dl className="space-y-2">
-              <Field label="ספק" value={data.vendor} />
-              <Field label="ח.פ / ע.מ" value={data.vendor_id} />
-              <Field label="מספר חשבונית" value={data.invoice_number} />
-              <Field label="תאריך חשבונית" value={data.invoice_date} />
-              <Field label="תאריך לתשלום" value={data.due_date} />
+              <Field label="Vendor" value={data.vendor} />
+              <Field label="Business ID" value={data.vendor_id} />
+              <Field label="Invoice Number" value={data.invoice_number} />
+              <Field label="Invoice Date" value={data.invoice_date} />
+              <Field label="Due Date" value={data.due_date} />
             </dl>
 
             <div>
-              <h3 className="mb-2 font-medium text-zinc-700 dark:text-zinc-300">פריטים</h3>
+              <h3 className="mb-2 font-medium text-zinc-700 dark:text-zinc-300">Items</h3>
               <table className="w-full text-xs">
                 <thead className="text-left text-zinc-500">
                   <tr>
-                    <th className="pb-1">תיאור</th>
-                    <th className="pb-1 text-right">כמות</th>
-                    <th className="pb-1 text-right">מחיר יחידה</th>
-                    <th className="pb-1 text-right">סה&quot;כ</th>
+                    <th className="pb-1">Description</th>
+                    <th className="pb-1 text-right">Quantity</th>
+                    <th className="pb-1 text-right">Unit Price</th>
+                    <th className="pb-1 text-right">Total</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -261,12 +261,12 @@ function DocumentPanel({
             </div>
 
             <dl className="space-y-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-              <Field label="סכום ביניים" value={formatILS(data.subtotal)} />
+              <Field label="Subtotal" value={formatILS(data.subtotal)} />
               <Field
-                label={`מע"מ (${(data.vat_rate * 100).toFixed(0)}%)`}
+                label={`VAT (${(data.vat_rate * 100).toFixed(0)}%)`}
                 value={formatILS(data.vat_amount)}
               />
-              <Field label='סה"כ לתשלום' value={formatILS(data.total)} bold />
+              <Field label="Total Due" value={formatILS(data.total)} bold />
             </dl>
           </div>
         )}
