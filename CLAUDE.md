@@ -31,8 +31,18 @@ API for external callers.
   (requires `X-API-Key` header)
 - `/web/app/page.tsx` — Server Component: fetches documents directly via Supabase,
   server-side, no API key involved
-- `/web/app/DashboardClient.tsx` — the interactive dashboard UI (upload button, table,
-  detail panel)
+- `/web/app/DashboardClient.tsx` — owns tab/filter/sort state and the upload flow;
+  composes `DocumentsTab`/`SummaryTab` and renders the row detail side panel
+- `/web/app/DocumentsTab.tsx` — Documents tab UI: filters, sortable table, CSV export
+  button
+- `/web/app/SummaryTab.tsx` — Summary tab UI: cumulative total, monthly totals, company
+  breakdown
+- `/web/lib/dashboardAggregations.ts` — pure, unit-tested filtering/sorting/aggregation
+  functions; source of truth for the totals and lists both tabs render
+- `/web/lib/csvExport.ts` — builds the CSV string and triggers the client-side download
+  for "ייצוא ל-CSV"
+- `/web/lib/testFixtures.ts` — shared `makeDoc()` test fixture used across the lib unit
+  tests
 
 ## API Authentication
 `/api/documents` and `/api/documents/[id]` require header: `X-API-Key: {API_KEY}`.
