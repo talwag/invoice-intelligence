@@ -6,12 +6,14 @@ import Footer from "./_components/landing/Footer";
 
 export default function Home() {
   return (
-    <main className="min-h-full bg-white dark:bg-black">
-      <Hero />
-      <Benefits />
-      <HowItWorks />
-      <SampleExtraction />
+    <>
+      <main className="min-h-full flex-1 bg-white dark:bg-black">
+        <Hero />
+        <Benefits />
+        <HowItWorks />
+        <SampleExtraction />
+      </main>
       <Footer />
-    </main>
+    </>
   );
 }

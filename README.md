@@ -4,10 +4,13 @@ Upload an invoice PDF, get back structured JSON (vendor, line items, VAT, totals
 confidence score) in seconds — via a small Next.js dashboard and a REST API.
 
 **Live:** https://your-deployment.workers.dev
+**Dashboard:** https://your-deployment.workers.dev/app
 
 ## What it does
 
-1. You drop a PDF invoice into the dashboard (or `POST` it to `/api/upload`).
+`/` is a static marketing landing page; the dashboard itself lives at `/app`.
+
+1. You drop a PDF invoice into the dashboard at `/app` (or `POST` it to `/api/upload`).
 2. The file is stored, a `documents` row is created with `status: "processing"`.
 3. Gemini 2.5 Flash extracts the invoice fields as JSON.
 4. The row is updated to `status: "done"` (or `"failed"`) with the extracted data.
@@ -18,7 +21,7 @@ confidence score) in seconds — via a small Next.js dashboard and a REST API.
 ## Architecture
 
 ```
-Browser (dashboard)
+Browser (/ landing page, /app dashboard)
    │  Server Component fetch — no auth needed, runs server-side only
    ▼
 Next.js App Router  ──────────────────────────►  external caller (curl, a CRM, …)
@@ -78,6 +81,7 @@ API_KEY=<any random string — this app's own REST auth secret>
 
 ```bash
 npm run dev        # http://localhost:3000 (or next free port)
+                    # / is the marketing landing page; the dashboard is at /app
 ```
 
 **Tests** (`web/lib/extractor.test.ts`, using Vitest — Gemini calls are mocked,
