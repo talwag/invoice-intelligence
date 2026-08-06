@@ -42,14 +42,12 @@ export function getMonthOptions(documents: Document[]): string[] {
   return Array.from(months).sort().reverse();
 }
 
+function hasExtractedData(doc: Document): doc is Document & { extracted_data: ExtractedData } {
+  return doc.status === "done" && doc.extracted_data !== null;
+}
+
 export function getCompanyOptions(documents: Document[]): string[] {
-  const companies = new Set(
-    documents
-      .filter((d): d is Document & { extracted_data: ExtractedData } =>
-        d.status === "done" && d.extracted_data !== null
-      )
-      .map((d) => d.extracted_data.vendor)
-  );
+  const companies = new Set(documents.filter(hasExtractedData).map((d) => d.extracted_data.vendor));
   return Array.from(companies).sort();
 }
 
@@ -99,8 +97,7 @@ export interface MonthlyTotal {
 
 export function getMonthlyTotals(documents: Document[]): MonthlyTotal[] {
   const totals = new Map<string, number>();
-  for (const doc of documents) {
-    if (doc.status !== "done" || !doc.extracted_data) continue;
+  for (const doc of documents.filter(hasExtractedData)) {
     const month = doc.created_at.slice(0, 7);
     totals.set(month, (totals.get(month) ?? 0) + doc.extracted_data.total);
   }
@@ -110,11 +107,7 @@ export function getMonthlyTotals(documents: Document[]): MonthlyTotal[] {
 }
 
 export function getCumulativeTotal(documents: Document[]): number {
-  return documents
-    .filter((d): d is Document & { extracted_data: ExtractedData } =>
-      d.status === "done" && d.extracted_data !== null
-    )
-    .reduce((sum, d) => sum + d.extracted_data.total, 0);
+  return documents.filter(hasExtractedData).reduce((sum, d) => sum + d.extracted_data.total, 0);
 }
 
 export interface CompanyBreakdown {
@@ -124,8 +117,7 @@ export interface CompanyBreakdown {
 
 export function getCompanyBreakdown(documents: Document[]): CompanyBreakdown[] {
   const totals = new Map<string, number>();
-  for (const doc of documents) {
-    if (doc.status !== "done" || !doc.extracted_data) continue;
+  for (const doc of documents.filter(hasExtractedData)) {
     const vendor = doc.extracted_data.vendor;
     totals.set(vendor, (totals.get(vendor) ?? 0) + doc.extracted_data.total);
   }
