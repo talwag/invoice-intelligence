@@ -29,14 +29,20 @@ API for external callers.
   `X-API-Key` header)
 - `/web/app/api/documents/[id]/route.ts` — GET endpoint: single document by ID
   (requires `X-API-Key` header)
-- `/web/app/page.tsx` — Server Component: fetches documents directly via Supabase,
-  server-side, no API key involved
-- `/web/app/DashboardClient.tsx` — owns tab/filter/sort state and the upload flow;
-  composes `DocumentsTab`/`SummaryTab` and renders the row detail side panel
-- `/web/app/DocumentsTab.tsx` — Documents tab UI: filters, sortable table, CSV export
-  button
-- `/web/app/SummaryTab.tsx` — Summary tab UI: cumulative total, monthly totals, company
-  breakdown
+- `/web/app/page.tsx` — the marketing landing page (static, no data fetching);
+  links to `/app` for the actual dashboard
+- `/web/app/_components/landing/` — Hero, Benefits, HowItWorks,
+  SampleExtraction, Footer — the landing page's section components
+- `/web/app/app/page.tsx` — Server Component: fetches documents directly via
+  Supabase, server-side, no API key involved (moved from `/web/app/page.tsx`
+  to make room for the landing page above)
+- `/web/app/app/DashboardClient.tsx` — owns tab/filter/sort state and the
+  upload flow; composes `DocumentsTab`/`SummaryTab` and renders the row
+  detail side panel
+- `/web/app/app/DocumentsTab.tsx` — Documents tab UI: filters, sortable
+  table, CSV export button
+- `/web/app/app/SummaryTab.tsx` — Summary tab UI: cumulative total, monthly
+  totals, company breakdown
 - `/web/lib/dashboardAggregations.ts` — pure, unit-tested filtering/sorting/aggregation
   functions; source of truth for the totals and lists both tabs render
 - `/web/lib/csvExport.ts` — builds the CSV string and triggers the client-side download
