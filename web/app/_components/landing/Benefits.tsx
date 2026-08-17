@@ -1,28 +1,27 @@
 const BENEFITS = [
   {
-    title: "Instant extraction",
-    description: "AI reads your invoice and extracts every field in seconds, not minutes.",
+    title: "חילוץ מיידי",
+    description: "בינה מלאכותית קוראת את החשבונית ומחלצת כל שדה תוך שניות, לא דקות.",
   },
   {
-    title: "No manual entry",
-    description: "Stop typing invoice data by hand. Upload a PDF and you're done.",
+    title: "ללא הזנה ידנית",
+    description: "הפסק להקליד נתוני חשבוניות ידנית. העלה PDF וזהו.",
   },
   {
-    title: "Export anytime",
+    title: "ייצוא בכל עת",
     description:
-      "Filter by month or company, then export to CSV in one click — ready for your spreadsheet or accounting software.",
+      "סנן לפי חודש או חברה, ואז ייצא ל-CSV בלחיצה אחת — מוכן לגיליון האלקטרוני או לתוכנת הנהלת החשבונות שלך.",
   },
   {
-    title: "Confidence scoring built in",
-    description:
-      "Every extraction includes a confidence score, so you always know what's worth double-checking.",
+    title: "דירוג ביטחון מובנה",
+    description: "כל חילוץ כולל ציון ביטחון, כך שתמיד תדע מה כדאי לבדוק שוב.",
   },
 ];
 
 export default function Benefits() {
   return (
     <section className="px-6 py-16">
-      <h2 className="sr-only">Benefits</h2>
+      <h2 className="sr-only">יתרונות</h2>
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {BENEFITS.map((benefit) => (
           <div key={benefit.title} className="rounded-xl border border-zinc-200 p-6 dark:border-zinc-800">

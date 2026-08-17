@@ -1,6 +1,6 @@
-import type { Document } from "./dashboardAggregations";
+import { STATUS_LABELS, type Document } from "./dashboardAggregations";
 
-const CSV_HEADERS = ["Filename", "Date", "Company", "Status", "Confidence", "Total"];
+const CSV_HEADERS = ["שם קובץ", "תאריך", "חברה", "סטטוס", "רמת ביטחון", "סך הכל"];
 
 function escapeCsvField(value: string): string {
   // Neutralize CSV/formula injection: a leading '=', '+', '-', or '@' can be
@@ -25,7 +25,7 @@ export function documentsToCsv(documents: Document[]): string {
       doc.filename,
       doc.created_at.slice(0, 10),
       company,
-      doc.status,
+      STATUS_LABELS[doc.status],
       confidence,
       total,
     ]

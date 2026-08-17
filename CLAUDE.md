@@ -79,7 +79,7 @@ for external callers (curl, a CRM integration, etc.) only.
    excluded from these totals but still appear in the Documents tab), independent
    of the Documents tab's filters (see docs/superpowers/specs/2026-08-04-admin-dashboard-design.md for why)
 5. Click any row in the Documents table: side panel showing vendor, business ID,
-   dates, line items, VAT breakdown, and total, with English labels
+   dates, line items, VAT breakdown, and total, with Hebrew labels
 6. Warning banner in the side panel if confidence < 0.7
 7. Filtering/sorting/aggregation logic lives in web/lib/dashboardAggregations.ts
    (pure functions, unit-tested) — DocumentsTab.tsx and SummaryTab.tsx render,
@@ -91,11 +91,20 @@ for external callers (curl, a CRM integration, etc.) only.
   shared dependency the web app calls into
 - All database access via the Supabase JS client (`web/lib/supabase.ts`)
 - Monetary values formatted with the ₪ symbol
-- UI labels are English throughout. Hebrew appears only in extracted *data* (e.g.
-  vendor names — `extractor.ts`'s prompt standardizes on Hebrew when an invoice shows
-  both languages, see the extraction prompt for why), never in hardcoded app text.
-  `ensure_ascii=False` in the Python reference implementation keeps that Hebrew data
-  readable in its own output.
+- The entire UI (landing page + dashboard) is Hebrew and RTL: `web/app/layout.tsx`
+  sets `lang="he"` `dir="rtl"` on `<html>` and uses the Heebo font (Geist has no
+  Hebrew glyphs). Dates use `toLocaleDateString("he-IL")` / `formatMonthLabel`'s
+  `he-IL` locale, not `en-US`. Tailwind classes use logical properties (`text-start`/
+  `text-end`, `ms-`/`me-`) instead of physical ones (`text-left`/`text-right`, `ml-`/
+  `mr-`) so the layout mirrors correctly under `dir="rtl"` without needing `rtl:`
+  variants — keep using logical properties in any new UI. `README.md`, `CLAUDE.md`,
+  code comments, and `extractor.ts`'s Gemini prompt stay in English (developer docs/
+  logic, not rendered UI). The product name "Invoice Intelligence" itself stays
+  untranslated (brand name).
+- Extracted invoice *data* (e.g. vendor names) already tends to be Hebrew —
+  `extractor.ts`'s prompt standardizes on Hebrew when an invoice shows both
+  languages, see the extraction prompt for why. `ensure_ascii=False` in the Python
+  reference implementation keeps that Hebrew data readable in its own output.
 - `confidence < 0.7` triggers a warning banner in the UI
 - Every interactive control in the dashboard (tabs, buttons, filters, sortable
   headers, table rows) has a native `title` attribute for a hover tooltip explaining

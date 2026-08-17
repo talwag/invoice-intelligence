@@ -2,6 +2,7 @@
 
 import {
   formatMonthLabel,
+  STATUS_LABELS,
   type Document,
   type SortColumn,
   type SortDirection,
@@ -48,7 +49,7 @@ function StatusBadge({ status }: { status: Document["status"] }) {
   };
   return (
     <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}>
-      {status}
+      {STATUS_LABELS[status]}
     </span>
   );
 }
@@ -71,7 +72,7 @@ function SortableHeader({
     <th className="px-4 py-3 font-medium">
       <button
         onClick={() => onSortChange(column)}
-        title={`Sort by ${label.toLowerCase()}${active ? (sortDirection === "asc" ? " (currently ascending, click for descending)" : " (currently descending, click for ascending)") : ""}`}
+        title={`מיין לפי ${label}${active ? (sortDirection === "asc" ? " (כרגע בסדר עולה, לחיצה תשנה לסדר יורד)" : " (כרגע בסדר יורד, לחיצה תשנה לסדר עולה)") : ""}`}
         className="flex cursor-pointer items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100"
       >
         {label}
@@ -106,10 +107,10 @@ export default function DocumentsTab({
         <select
           value={selectedMonth ?? ""}
           onChange={(e) => onMonthChange(e.target.value || null)}
-          title="Filter by month"
+          title="סנן לפי חודש"
           className="cursor-pointer rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-800 dark:bg-zinc-950"
         >
-          <option value="">All months</option>
+          <option value="">כל החודשים</option>
           {monthOptions.map((month) => (
             <option key={month} value={month}>
               {formatMonthLabel(month)}
@@ -120,10 +121,10 @@ export default function DocumentsTab({
         <select
           value={selectedCompany ?? ""}
           onChange={(e) => onCompanyChange(e.target.value || null)}
-          title="Filter by company"
+          title="סנן לפי חברה"
           className="cursor-pointer rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-800 dark:bg-zinc-950"
         >
-          <option value="">All companies</option>
+          <option value="">כל החברות</option>
           {companyOptions.map((company) => (
             <option key={company} value={company}>
               {company}
@@ -133,46 +134,46 @@ export default function DocumentsTab({
 
         <button
           onClick={handleExport}
-          title="Export the currently filtered and sorted documents as a CSV file"
-          className="ml-auto cursor-pointer rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
+          title="ייצא את המסמכים המסוננים והממוינים כקובץ CSV"
+          className="ms-auto cursor-pointer rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
         >
-          Export to CSV
+          ייצוא ל-CSV
         </button>
       </div>
 
       <table className="w-full text-sm">
-        <thead className="bg-zinc-100 text-left text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
+        <thead className="bg-zinc-100 text-start text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
           <tr>
-            <th className="px-4 py-3 font-medium">Filename</th>
+            <th className="px-4 py-3 font-medium">שם קובץ</th>
             <SortableHeader
-              label="Date"
+              label="תאריך"
               column="date"
               sortBy={sortBy}
               sortDirection={sortDirection}
               onSortChange={onSortChange}
             />
             <SortableHeader
-              label="Company"
+              label="חברה"
               column="company"
               sortBy={sortBy}
               sortDirection={sortDirection}
               onSortChange={onSortChange}
             />
-            <th className="px-4 py-3 font-medium">Status</th>
-            <th className="px-4 py-3 font-medium">Confidence</th>
+            <th className="px-4 py-3 font-medium">סטטוס</th>
+            <th className="px-4 py-3 font-medium">רמת ביטחון</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
           {isRefreshing ? (
             <tr>
               <td colSpan={5} className="px-4 py-8 text-center text-zinc-400">
-                Refreshing...
+                מרענן...
               </td>
             </tr>
           ) : documents.length === 0 ? (
             <tr>
               <td colSpan={5} className="px-4 py-8 text-center text-zinc-400">
-                No matching documents
+                לא נמצאו מסמכים תואמים
               </td>
             </tr>
           ) : (
@@ -180,12 +181,12 @@ export default function DocumentsTab({
               <tr
                 key={doc.id}
                 onClick={() => onSelectDocument(doc)}
-                title="Click to view full extracted details"
+                title="לחץ לצפייה בפרטים המלאים"
                 className="cursor-pointer bg-white hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900"
               >
                 <td className="px-4 py-3 text-zinc-900 dark:text-zinc-100">{doc.filename}</td>
                 <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
-                  {new Date(doc.created_at).toLocaleDateString("en-US")}
+                  {new Date(doc.created_at).toLocaleDateString("he-IL")}
                 </td>
                 <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
                   {doc.extracted_data?.vendor ?? "—"}

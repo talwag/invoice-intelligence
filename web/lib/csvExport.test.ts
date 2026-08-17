@@ -6,8 +6,8 @@ describe("documentsToCsv", () => {
   it("produces a header row plus one row per document", () => {
     const csv = documentsToCsv([makeDoc({ id: "1" })]);
     const lines = csv.split("\n");
-    expect(lines[0]).toBe("Filename,Date,Company,Status,Confidence,Total");
-    expect(lines[1]).toBe("invoice.pdf,2026-07-15,Acme Ltd,done,95%,117.00");
+    expect(lines[0]).toBe("שם קובץ,תאריך,חברה,סטטוס,רמת ביטחון,סך הכל");
+    expect(lines[1]).toBe("invoice.pdf,2026-07-15,Acme Ltd,הושלם,95%,117.00");
     expect(lines).toHaveLength(2);
   });
 
@@ -15,7 +15,7 @@ describe("documentsToCsv", () => {
     const csv = documentsToCsv([
       makeDoc({ id: "1", status: "processing", confidence: null, extracted_data: null }),
     ]);
-    expect(csv.split("\n")[1]).toBe("invoice.pdf,2026-07-15,,processing,,");
+    expect(csv.split("\n")[1]).toBe("invoice.pdf,2026-07-15,,בעיבוד,,");
   });
 
   it("quotes fields containing commas, and escapes embedded quotes", () => {
@@ -32,7 +32,7 @@ describe("documentsToCsv", () => {
   });
 
   it("returns just the header row for an empty list", () => {
-    expect(documentsToCsv([])).toBe("Filename,Date,Company,Status,Confidence,Total");
+    expect(documentsToCsv([])).toBe("שם קובץ,תאריך,חברה,סטטוס,רמת ביטחון,סך הכל");
   });
 
   it.each(["=", "+", "-", "@"])(
@@ -58,7 +58,7 @@ describe("documentsToCsv", () => {
 
   it("leaves a normal field (not starting with =, +, -, or @) unaffected", () => {
     const csv = documentsToCsv([makeDoc({ id: "1", filename: "invoice.pdf" })]);
-    expect(csv.split("\n")[1]).toBe("invoice.pdf,2026-07-15,Acme Ltd,done,95%,117.00");
+    expect(csv.split("\n")[1]).toBe("invoice.pdf,2026-07-15,Acme Ltd,הושלם,95%,117.00");
   });
 
   it("applies both the injection guard and comma/quote escaping when a field needs both", () => {

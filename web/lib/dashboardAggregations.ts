@@ -37,6 +37,12 @@ export interface DocumentFilters {
 export type SortColumn = "date" | "company";
 export type SortDirection = "asc" | "desc";
 
+export const STATUS_LABELS: Record<Document["status"], string> = {
+  processing: "בעיבוד",
+  done: "הושלם",
+  failed: "נכשל",
+};
+
 export function getMonthOptions(documents: Document[]): string[] {
   const months = new Set(documents.map((d) => d.created_at.slice(0, 7)));
   return Array.from(months).sort().reverse();
@@ -77,7 +83,7 @@ export function sortDocuments(
 export function formatMonthLabel(month: string): string {
   const [year, monthNum] = month.split("-");
   const date = new Date(Number(year), Number(monthNum) - 1, 1);
-  return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  return date.toLocaleDateString("he-IL", { month: "long", year: "numeric" });
 }
 
 export function formatILS(value: number | null | undefined): string {

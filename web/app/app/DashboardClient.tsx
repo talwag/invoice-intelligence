@@ -69,7 +69,7 @@ export default function DashboardClient({
     if (!file) return;
 
     if (file.type !== "application/pdf") {
-      setUploadMessage({ type: "error", text: "Only PDF files are supported" });
+      setUploadMessage({ type: "error", text: "נתמכים רק קבצי PDF" });
       return;
     }
 
@@ -83,15 +83,15 @@ export default function DashboardClient({
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result.error ?? "Upload failed");
+        throw new Error(result.error ?? "ההעלאה נכשלה");
       }
 
-      setUploadMessage({ type: "success", text: `${file.name} uploaded successfully` });
+      setUploadMessage({ type: "success", text: `${file.name} הועלה בהצלחה` });
       startTransition(() => router.refresh());
     } catch (err) {
       setUploadMessage({
         type: "error",
-        text: err instanceof Error ? err.message : "Upload failed",
+        text: err instanceof Error ? err.message : "ההעלאה נכשלה",
       });
     } finally {
       setUploading(false);
@@ -117,13 +117,13 @@ export default function DashboardClient({
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              title="Upload an invoice PDF for automatic extraction"
+              title="העלה חשבונית PDF לחילוץ אוטומטי"
               className="flex cursor-pointer items-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:cursor-default disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
             >
               {uploading && (
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white dark:border-zinc-900/40 dark:border-t-zinc-900" />
               )}
-              {uploading ? "Processing..." : "Upload PDF"}
+              {uploading ? "מעבד..." : "העלה PDF"}
             </button>
           </div>
         </div>
@@ -149,25 +149,25 @@ export default function DashboardClient({
         <div className="mt-8 flex gap-1 border-b border-zinc-200 dark:border-zinc-800">
           <button
             onClick={() => setActiveTab("documents")}
-            title="View all uploaded documents"
+            title="צפה בכל המסמכים שהועלו"
             className={`cursor-pointer px-4 py-2 text-sm font-medium ${
               activeTab === "documents"
                 ? "border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
                 : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
             }`}
           >
-            Documents
+            מסמכים
           </button>
           <button
             onClick={() => setActiveTab("summary")}
-            title="View totals and breakdowns across all documents"
+            title="צפה בסכומים ובפילוחים על כל המסמכים"
             className={`cursor-pointer px-4 py-2 text-sm font-medium ${
               activeTab === "summary"
                 ? "border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
                 : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
             }`}
           >
-            Summary
+            סיכום
           </button>
         </div>
 
@@ -219,7 +219,7 @@ function DocumentPanel({
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
             {document.filename}
           </h2>
-          <button onClick={onClose} title="Close" className="cursor-pointer text-zinc-400 hover:text-zinc-600">
+          <button onClick={onClose} title="סגור" className="cursor-pointer text-zinc-400 hover:text-zinc-600">
             ✕
           </button>
         </div>
@@ -227,44 +227,44 @@ function DocumentPanel({
         {!data ? (
           <p className="mt-6 text-sm text-zinc-500">
             {document.status === "processing"
-              ? "This document is still processing..."
-              : "No extracted data found"}
+              ? "המסמך עדיין בעיבוד..."
+              : "לא נמצאו נתונים מחולצים"}
           </p>
         ) : (
           <div className="mt-6 space-y-4 text-sm">
             {data.confidence < 0.7 && (
               <div className="rounded-lg bg-yellow-50 px-4 py-3 text-yellow-800">
-                ⚠ Low extraction confidence (
-                {(data.confidence * 100).toFixed(0)}%) — manual review recommended
+                ⚠ רמת ביטחון נמוכה בחילוץ (
+                {(data.confidence * 100).toFixed(0)}%) — מומלצת בדיקה ידנית
               </div>
             )}
 
             <dl className="space-y-2">
-              <Field label="Vendor" value={data.vendor} />
-              <Field label="Business ID" value={data.vendor_id} />
-              <Field label="Invoice Number" value={data.invoice_number} />
-              <Field label="Invoice Date" value={data.invoice_date} />
-              <Field label="Due Date" value={data.due_date} />
+              <Field label="ספק" value={data.vendor} />
+              <Field label="מספר עוסק" value={data.vendor_id} />
+              <Field label="מספר חשבונית" value={data.invoice_number} />
+              <Field label="תאריך חשבונית" value={data.invoice_date} />
+              <Field label="תאריך פירעון" value={data.due_date} />
             </dl>
 
             <div>
-              <h3 className="mb-2 font-medium text-zinc-700 dark:text-zinc-300">Items</h3>
+              <h3 className="mb-2 font-medium text-zinc-700 dark:text-zinc-300">פריטים</h3>
               <table className="w-full text-xs">
-                <thead className="text-left text-zinc-500">
+                <thead className="text-start text-zinc-500">
                   <tr>
-                    <th className="pb-1">Description</th>
-                    <th className="pb-1 text-right">Quantity</th>
-                    <th className="pb-1 text-right">Unit Price</th>
-                    <th className="pb-1 text-right">Total</th>
+                    <th className="pb-1">תיאור</th>
+                    <th className="pb-1 text-end">כמות</th>
+                    <th className="pb-1 text-end">מחיר יחידה</th>
+                    <th className="pb-1 text-end">סה&quot;כ</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                   {data.items.map((item, i) => (
                     <tr key={i}>
                       <td className="py-1.5">{item.description}</td>
-                      <td className="py-1.5 text-right">{item.quantity}</td>
-                      <td className="py-1.5 text-right">{formatILS(item.unit_price)}</td>
-                      <td className="py-1.5 text-right">{formatILS(item.line_total)}</td>
+                      <td className="py-1.5 text-end">{item.quantity}</td>
+                      <td className="py-1.5 text-end">{formatILS(item.unit_price)}</td>
+                      <td className="py-1.5 text-end">{formatILS(item.line_total)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -272,12 +272,12 @@ function DocumentPanel({
             </div>
 
             <dl className="space-y-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-              <Field label="Subtotal" value={formatILS(data.subtotal)} />
+              <Field label="סכום ביניים" value={formatILS(data.subtotal)} />
               <Field
-                label={`VAT (${(data.vat_rate * 100).toFixed(0)}%)`}
+                label={`מע"מ (${(data.vat_rate * 100).toFixed(0)}%)`}
                 value={formatILS(data.vat_amount)}
               />
-              <Field label="Total Due" value={formatILS(data.total)} bold />
+              <Field label={'סה"כ לתשלום'} value={formatILS(data.total)} bold />
             </dl>
           </div>
         )}

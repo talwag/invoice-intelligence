@@ -18,7 +18,7 @@ export default function SummaryTab({ documents }: { documents: Document[] }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
           <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-            Cumulative Total
+            סכום מצטבר
           </div>
           <div className="mt-1 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
             {formatILS(cumulativeTotal)}
@@ -26,7 +26,7 @@ export default function SummaryTab({ documents }: { documents: Document[] }) {
         </div>
         <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
           <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-            Documents Processed
+            מסמכים שעובדו
           </div>
           <div className="mt-1 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
             {documents.filter((d) => d.status === "done").length}
@@ -35,9 +35,9 @@ export default function SummaryTab({ documents }: { documents: Document[] }) {
       </div>
 
       <div className="mt-6">
-        <h3 className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">Monthly Summary</h3>
+        <h3 className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">סיכום חודשי</h3>
         {monthlyTotals.length === 0 ? (
-          <p className="text-sm text-zinc-400">No data yet</p>
+          <p className="text-sm text-zinc-400">אין נתונים עדיין</p>
         ) : (
           <div className="divide-y divide-zinc-200 rounded-lg border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
             {monthlyTotals.map((row) => (
@@ -51,9 +51,9 @@ export default function SummaryTab({ documents }: { documents: Document[] }) {
       </div>
 
       <div className="mt-6">
-        <h3 className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">Breakdown by Company</h3>
+        <h3 className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">פילוח לפי חברה</h3>
         {companyBreakdown.length === 0 ? (
-          <p className="text-sm text-zinc-400">No data yet</p>
+          <p className="text-sm text-zinc-400">אין נתונים עדיין</p>
         ) : (
           <div className="space-y-2">
             {companyBreakdown.map((row) => (
@@ -65,7 +65,7 @@ export default function SummaryTab({ documents }: { documents: Document[] }) {
                     style={{ width: `${(row.total / maxCompanyTotal) * 100}%` }}
                   />
                 </div>
-                <span className="w-24 text-right tabular-nums text-zinc-900 dark:text-zinc-100">
+                <span className="w-24 text-end tabular-nums text-zinc-900 dark:text-zinc-100">
                   {formatILS(row.total)}
                 </span>
               </div>

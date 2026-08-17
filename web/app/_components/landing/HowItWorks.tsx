@@ -1,13 +1,13 @@
 const STEPS = [
-  { title: "Upload", description: "Drop in any invoice PDF." },
+  { title: "העלאה", description: "גרור לכאן כל חשבונית PDF." },
   {
-    title: "Extract",
-    description: "AI reads the document and pulls out vendor, items, VAT, and totals.",
+    title: "חילוץ",
+    description: 'בינה מלאכותית קוראת את המסמך ומחלצת ספק, פריטים, מע"מ וסכומים.',
   },
   {
-    title: "Review",
+    title: "בדיקה",
     description:
-      "See the structured result instantly, track monthly and cumulative totals, and export whenever you need to.",
+      "צפה בתוצאה המובנית באופן מיידי, עקוב אחר סכומים חודשיים ומצטברים, וייצא מתי שתרצה.",
   },
 ];
 
@@ -16,7 +16,7 @@ export default function HowItWorks() {
     <section className="bg-zinc-50 px-6 py-16 dark:bg-zinc-950">
       <div className="mx-auto max-w-5xl">
         <h2 className="text-center text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-          How it works
+          איך זה עובד
         </h2>
         <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3">
           {STEPS.map((step, i) => (
