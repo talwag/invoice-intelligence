@@ -97,6 +97,11 @@ describe("formatILS", () => {
     expect(formatILS(117)).toBe("₪117.00");
   });
 
+  it("groups digits with a thousands separator", () => {
+    expect(formatILS(1234.5)).toBe("₪1,234.50");
+    expect(formatILS(1000000)).toBe("₪1,000,000.00");
+  });
+
   it("returns a dash for null or undefined", () => {
     expect(formatILS(null)).toBe("—");
     expect(formatILS(undefined)).toBe("—");

@@ -89,7 +89,7 @@ export function formatMonthLabel(month: string): string {
 
 export function formatILS(value: number | null | undefined): string {
   if (value === null || value === undefined) return "—";
-  return `₪${value.toFixed(2)}`;
+  return `₪${value.toLocaleString("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 export interface MonthlyTotal {

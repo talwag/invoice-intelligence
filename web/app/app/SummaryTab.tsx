@@ -29,7 +29,7 @@ export default function SummaryTab({ documents }: { documents: Document[] }) {
             מסמכים שעובדו
           </div>
           <div className="mt-1 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-            {documents.filter((d) => d.status === "done").length}
+            {documents.filter((d) => d.status === "done").length.toLocaleString("he-IL")}
           </div>
         </div>
       </div>
