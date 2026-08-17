@@ -10,22 +10,20 @@ export default function Footer() {
       >
         פתח את האפליקציה
       </a>
-      <p className="mt-10 text-sm text-zinc-400">Invoice Intelligence</p>
-      <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
-        מעוניינים להטמיע מערכת כזו, או מערכת בהתאמה, בעסק שלכם? נשמח לשמוע מכם
-        —{" "}
+      <div className="mx-auto mt-10 max-w-xl rounded-xl border border-blue-200 bg-blue-50 px-6 py-5 text-base font-medium text-zinc-700 dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-zinc-200">
+        מעוניינים להטמיע מערכת כזו, או מערכת בהתאמה, בעסק שלכם? נשמח לשמוע מכם{" "}
         <a
           href="https://wa.me/972584431931"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-600 hover:underline dark:text-blue-400"
+          className="font-semibold text-blue-700 hover:underline dark:text-blue-400"
         >
           בוואטסאפ
         </a>
         ,{" "}
         <a
           href="mailto:raz@tovtech.org"
-          className="text-blue-600 hover:underline dark:text-blue-400"
+          className="font-semibold text-blue-700 hover:underline dark:text-blue-400"
         >
           במייל
         </a>{" "}
@@ -34,11 +32,12 @@ export default function Footer() {
           href="https://tovtech.org"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-600 hover:underline dark:text-blue-400"
+          className="font-semibold text-blue-700 hover:underline dark:text-blue-400"
         >
           tovtech.org
         </a>
-      </p>
+      </div>
+      <p className="mt-6 text-sm text-zinc-400">Invoice Intelligence</p>
     </footer>
   );
 }
