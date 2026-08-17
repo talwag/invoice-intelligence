@@ -11,6 +11,34 @@ export default function Footer() {
         פתח את האפליקציה
       </a>
       <p className="mt-10 text-sm text-zinc-400">Invoice Intelligence</p>
+      <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
+        מעוניינים להטמיע מערכת כזו, או מערכת בהתאמה, בעסק שלכם? נשמח לשמוע מכם
+        —{" "}
+        <a
+          href="https://wa.me/972584431931"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline dark:text-blue-400"
+        >
+          בוואטסאפ
+        </a>
+        ,{" "}
+        <a
+          href="mailto:raz@tovtech.org"
+          className="text-blue-600 hover:underline dark:text-blue-400"
+        >
+          במייל
+        </a>{" "}
+        או באתר{" "}
+        <a
+          href="https://tovtech.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline dark:text-blue-400"
+        >
+          tovtech.org
+        </a>
+      </p>
     </footer>
   );
 }
