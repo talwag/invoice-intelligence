@@ -8,7 +8,12 @@ API for external callers.
 ## Tech Stack
 - Frontend/API: Next.js 16 (App Router) + Tailwind CSS
 - File Storage: Supabase Storage
-- Database: Supabase (PostgreSQL)
+- Database: Supabase (PostgreSQL). Schema is managed by hand in the Supabase
+  dashboard's SQL Editor — there's no migrations folder in this repo. Current
+  `documents` columns beyond the obvious: `r2_key` (Storage path — named for
+  the original R2-based spec, never renamed after switching to Supabase
+  Storage) and `edited_at` (nullable timestamp, set when a document is
+  manually edited via the dashboard)
 - AI Extraction: `web/lib/extractor.ts` (TypeScript, `@google/genai`) — this is what
   runs in production. `extractor.py` / `schemas.py` (Python + Pydantic) is a standalone
   reference implementation only; Cloudflare Workers can't run Python, so it's not part
@@ -33,6 +38,16 @@ API for external callers.
   `X-API-Key` header)
 - `/web/app/api/documents/[id]/route.ts` — GET endpoint: single document by ID
   (requires `X-API-Key` header)
+- `/web/app/api/documents/[id]/pdf-url/route.ts` — GET endpoint: returns a
+  short-lived (5 min) Supabase Storage signed URL for the original PDF. No
+  `X-API-Key` — called from the dashboard's own "View PDF" button, and the
+  dashboard already has no auth wall
+- `/web/app/api/documents/[id]/edit/route.ts` — PATCH endpoint: saves manual
+  edits to vendor/business ID/invoice number/dates/line items/VAT rate.
+  Recomputes line_total/subtotal/vat_amount/total server-side via
+  `web/lib/invoiceMath.ts` (never trusts client-sent totals), re-validates
+  the merged object with `extractor.ts`'s `validateInvoiceExtraction`, and
+  sets `edited_at`. No `X-API-Key`, same reasoning as pdf-url
 - `/web/app/page.tsx` — the marketing landing page (static, no data fetching);
   links to `/app` for the actual dashboard
 - `/web/app/_components/landing/` — Hero, Benefits, HowItWorks,
@@ -41,14 +56,19 @@ API for external callers.
   Supabase, server-side, no API key involved (moved from `/web/app/page.tsx`
   to make room for the landing page above)
 - `/web/app/app/DashboardClient.tsx` — owns tab/filter/sort state and the
-  upload flow; composes `DocumentsTab`/`SummaryTab` and renders the row
-  detail side panel
+  upload flow; composes `DocumentsTab`/`SummaryTab` and renders `DocumentPanel`
+- `/web/app/app/DocumentPanel.tsx` — the row-click detail side panel: read-only
+  view, an editable mode (top-level fields + line items, with live-recalculated
+  totals), and the "View PDF" button
 - `/web/app/app/DocumentsTab.tsx` — Documents tab UI: filters, sortable
   table, CSV export button
 - `/web/app/app/SummaryTab.tsx` — Summary tab UI: cumulative total, monthly
   totals, company breakdown
 - `/web/lib/dashboardAggregations.ts` — pure, unit-tested filtering/sorting/aggregation
   functions; source of truth for the totals and lists both tabs render
+- `/web/lib/invoiceMath.ts` — pure, unit-tested `calculateInvoiceTotals`
+  (line_total/subtotal/vat_amount/total from items + VAT rate); used for both
+  the edit form's live preview and the edit endpoint's authoritative recompute
 - `/web/lib/csvExport.ts` — builds the CSV string and triggers the client-side download
   for the "Export to CSV" button
 - `/web/lib/testFixtures.ts` — shared `makeDoc()` test fixture used across the lib unit
@@ -84,6 +104,12 @@ for external callers (curl, a CRM integration, etc.) only.
 7. Filtering/sorting/aggregation logic lives in web/lib/dashboardAggregations.ts
    (pure functions, unit-tested) — DocumentsTab.tsx and SummaryTab.tsx render,
    they don't re-derive
+8. "View PDF" button in the side panel opens the original uploaded file (a
+   Supabase Storage signed URL) in a new tab
+9. "Edit" button in the side panel makes vendor/business ID/invoice number/
+   dates/line items/VAT rate editable; subtotal/VAT amount/total are always
+   computed (never directly editable) via web/lib/invoiceMath.ts. Saved edits
+   set `edited_at` on the document, shown as an "Edited" badge in the panel
 
 ## Conventions
 - Gemini calls for the deployed app go through `web/lib/extractor.ts` only —

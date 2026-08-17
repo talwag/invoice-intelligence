@@ -5,9 +5,9 @@ import type { ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import DocumentsTab from "./DocumentsTab";
 import SummaryTab from "./SummaryTab";
+import DocumentPanel from "./DocumentPanel";
 import {
   filterDocuments,
-  formatILS,
   getCompanyOptions,
   getMonthOptions,
   sortDocuments,
@@ -194,113 +194,15 @@ export default function DashboardClient({
       </div>
 
       {selectedDocument && (
-        <DocumentPanel document={selectedDocument} onClose={() => setSelectedDocument(null)} />
+        <DocumentPanel
+          document={selectedDocument}
+          onClose={() => setSelectedDocument(null)}
+          onDocumentUpdated={(updated) => {
+            setSelectedDocument(updated);
+            startTransition(() => router.refresh());
+          }}
+        />
       )}
-    </div>
-  );
-}
-
-function DocumentPanel({
-  document,
-  onClose,
-}: {
-  document: Document;
-  onClose: () => void;
-}) {
-  const data = document.extracted_data;
-
-  return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/30" onClick={onClose}>
-      <div
-        className="h-full w-full max-w-md overflow-y-auto bg-white p-6 shadow-xl dark:bg-zinc-950"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-            {document.filename}
-          </h2>
-          <button onClick={onClose} title="סגור" className="cursor-pointer text-zinc-400 hover:text-zinc-600">
-            ✕
-          </button>
-        </div>
-
-        {!data ? (
-          <p className="mt-6 text-sm text-zinc-500">
-            {document.status === "processing"
-              ? "המסמך עדיין בעיבוד..."
-              : "לא נמצאו נתונים מחולצים"}
-          </p>
-        ) : (
-          <div className="mt-6 space-y-4 text-sm">
-            {data.confidence < 0.7 && (
-              <div className="rounded-lg bg-yellow-50 px-4 py-3 text-yellow-800">
-                ⚠ רמת ביטחון נמוכה בחילוץ (
-                {(data.confidence * 100).toFixed(0)}%) — מומלצת בדיקה ידנית
-              </div>
-            )}
-
-            <dl className="space-y-2">
-              <Field label="ספק" value={data.vendor} />
-              <Field label="מספר עוסק" value={data.vendor_id} />
-              <Field label="מספר חשבונית" value={data.invoice_number} />
-              <Field label="תאריך חשבונית" value={data.invoice_date} />
-              <Field label="תאריך פירעון" value={data.due_date} />
-            </dl>
-
-            <div>
-              <h3 className="mb-2 font-medium text-zinc-700 dark:text-zinc-300">פריטים</h3>
-              <table className="w-full text-xs">
-                <thead className="text-start text-zinc-500">
-                  <tr>
-                    <th className="pb-1">תיאור</th>
-                    <th className="pb-1 text-end">כמות</th>
-                    <th className="pb-1 text-end">מחיר יחידה</th>
-                    <th className="pb-1 text-end">סה&quot;כ</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                  {data.items.map((item, i) => (
-                    <tr key={i}>
-                      <td className="py-1.5">{item.description}</td>
-                      <td className="py-1.5 text-end">{item.quantity}</td>
-                      <td className="py-1.5 text-end">{formatILS(item.unit_price)}</td>
-                      <td className="py-1.5 text-end">{formatILS(item.line_total)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <dl className="space-y-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-              <Field label="סכום ביניים" value={formatILS(data.subtotal)} />
-              <Field
-                label={`מע"מ (${(data.vat_rate * 100).toFixed(0)}%)`}
-                value={formatILS(data.vat_amount)}
-              />
-              <Field label={'סה"כ לתשלום'} value={formatILS(data.total)} bold />
-            </dl>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function Field({
-  label,
-  value,
-  bold,
-}: {
-  label: string;
-  value: string | number | null | undefined;
-  bold?: boolean;
-}) {
-  return (
-    <div className="flex justify-between">
-      <dt className="text-zinc-500">{label}</dt>
-      <dd className={`text-zinc-900 dark:text-zinc-100 ${bold ? "font-semibold" : ""}`}>
-        {value ?? "—"}
-      </dd>
     </div>
   );
 }

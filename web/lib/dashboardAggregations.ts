@@ -27,6 +27,7 @@ export interface Document {
   confidence: number | null;
   extracted_data: ExtractedData | null;
   created_at: string;
+  edited_at: string | null;
 }
 
 export interface DocumentFilters {

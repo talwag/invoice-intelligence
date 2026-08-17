@@ -6,6 +6,7 @@ export function makeDoc(overrides: Partial<Document> & { id: string }): Document
     status: "done",
     confidence: 0.95,
     created_at: "2026-07-15T10:00:00.000Z",
+    edited_at: null,
     extracted_data: {
       vendor: "Acme Ltd",
       vendor_id: null,
