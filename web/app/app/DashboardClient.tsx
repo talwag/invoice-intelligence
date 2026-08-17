@@ -22,8 +22,10 @@ type Tab = "documents" | "summary";
 
 export default function DashboardClient({
   initialDocuments,
+  loadError,
 }: {
   initialDocuments: Document[];
+  loadError?: string | null;
 }) {
   const router = useRouter();
   const [isRefreshing, startTransition] = useTransition();
@@ -115,6 +117,7 @@ export default function DashboardClient({
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
+              title="Upload an invoice PDF for automatic extraction"
               className="flex items-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
             >
               {uploading && (
@@ -124,6 +127,12 @@ export default function DashboardClient({
             </button>
           </div>
         </div>
+
+        {loadError && (
+          <div className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800">
+            {loadError}
+          </div>
+        )}
 
         {uploadMessage && (
           <div
@@ -140,6 +149,7 @@ export default function DashboardClient({
         <div className="mt-8 flex gap-1 border-b border-zinc-200 dark:border-zinc-800">
           <button
             onClick={() => setActiveTab("documents")}
+            title="View all uploaded documents"
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === "documents"
                 ? "border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
@@ -150,6 +160,7 @@ export default function DashboardClient({
           </button>
           <button
             onClick={() => setActiveTab("summary")}
+            title="View totals and breakdowns across all documents"
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === "summary"
                 ? "border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
@@ -208,7 +219,7 @@ function DocumentPanel({
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
             {document.filename}
           </h2>
-          <button onClick={onClose} className="text-zinc-400 hover:text-zinc-600">
+          <button onClick={onClose} title="Close" className="text-zinc-400 hover:text-zinc-600">
             ✕
           </button>
         </div>

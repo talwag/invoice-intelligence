@@ -71,6 +71,7 @@ function SortableHeader({
     <th className="px-4 py-3 font-medium">
       <button
         onClick={() => onSortChange(column)}
+        title={`Sort by ${label.toLowerCase()}${active ? (sortDirection === "asc" ? " (currently ascending, click for descending)" : " (currently descending, click for ascending)") : ""}`}
         className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100"
       >
         {label}
@@ -105,6 +106,7 @@ export default function DocumentsTab({
         <select
           value={selectedMonth ?? ""}
           onChange={(e) => onMonthChange(e.target.value || null)}
+          title="Filter by month"
           className="rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-800 dark:bg-zinc-950"
         >
           <option value="">All months</option>
@@ -118,6 +120,7 @@ export default function DocumentsTab({
         <select
           value={selectedCompany ?? ""}
           onChange={(e) => onCompanyChange(e.target.value || null)}
+          title="Filter by company"
           className="rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-800 dark:bg-zinc-950"
         >
           <option value="">All companies</option>
@@ -130,6 +133,7 @@ export default function DocumentsTab({
 
         <button
           onClick={handleExport}
+          title="Export the currently filtered and sorted documents as a CSV file"
           className="ml-auto rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
         >
           Export to CSV
@@ -176,6 +180,7 @@ export default function DocumentsTab({
               <tr
                 key={doc.id}
                 onClick={() => onSelectDocument(doc)}
+                title="Click to view full extracted details"
                 className="cursor-pointer bg-white hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900"
               >
                 <td className="px-4 py-3 text-zinc-900 dark:text-zinc-100">{doc.filename}</td>

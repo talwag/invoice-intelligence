@@ -8,10 +8,21 @@ import type { Document } from "@/lib/dashboardAggregations";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("documents")
     .select("*")
     .order("created_at", { ascending: false });
 
-  return <DashboardClient initialDocuments={(data as Document[] | null) ?? []} />;
+  if (error) {
+    console.error("Failed to fetch documents:", error);
+  }
+
+  return (
+    <DashboardClient
+      initialDocuments={(data as Document[] | null) ?? []}
+      loadError={
+        error ? "Couldn't load documents — the database may be unreachable. Try refreshing in a moment." : null
+      }
+    />
+  );
 }

@@ -14,7 +14,11 @@ API for external callers.
   reference implementation only; Cloudflare Workers can't run Python, so it's not part
   of the deployed app.
 - Deploy: Cloudflare Workers, via the `@opennextjs/cloudflare` adapter (not Cloudflare
-  Pages — the Next.js-on-Pages adapter is deprecated)
+  Pages — the Next.js-on-Pages adapter is deprecated). The Worker's entry point is
+  `web/custom-worker.js`, not the OpenNext-generated `.open-next/worker.js` directly —
+  it wraps the generated `fetch` handler and adds a `scheduled` handler (see
+  `web/wrangler.jsonc`'s `triggers.crons`) that pings Supabase daily to prevent the
+  free-tier project from auto-pausing after 7 days of inactivity.
 - Testing: Vitest (`web/lib/extractor.test.ts`) — Gemini calls are mocked via
   `vi.mock("@google/genai", ...)`, so tests run without real API calls, a key, or cost
 
@@ -49,6 +53,9 @@ API for external callers.
   for the "Export to CSV" button
 - `/web/lib/testFixtures.ts` — shared `makeDoc()` test fixture used across the lib unit
   tests
+- `/web/custom-worker.js` — the actual deployed Worker entry point (see
+  `web/wrangler.jsonc`'s `"main"`); wraps `.open-next/worker.js`'s generated `fetch`
+  handler and adds a `scheduled` handler for the daily Supabase keep-alive ping
 
 ## API Authentication
 `/api/documents` and `/api/documents/[id]` require header: `X-API-Key: {API_KEY}`.
@@ -90,6 +97,9 @@ for external callers (curl, a CRM integration, etc.) only.
   `ensure_ascii=False` in the Python reference implementation keeps that Hebrew data
   readable in its own output.
 - `confidence < 0.7` triggers a warning banner in the UI
+- Every interactive control in the dashboard (tabs, buttons, filters, sortable
+  headers, table rows) has a native `title` attribute for a hover tooltip explaining
+  what it does — keep this up when adding new controls
 - Changes to `web/lib/extractor.ts` should come with matching test updates in
   `web/lib/extractor.test.ts` — that file mocks the Gemini call, so run `npm test`
   before deploying, not just `tsc`

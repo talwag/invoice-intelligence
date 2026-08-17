@@ -130,7 +130,13 @@ npm run cf:deploy   # opennextjs-cloudflare build && opennextjs-cloudflare deplo
 
 Requires `wrangler login` once, and the following secrets set on the Worker
 (`wrangler secret put <NAME>`, not committed anywhere): `API_KEY`,
-`GEMINI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
+`GEMINI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_URL`.
+
+The Worker also runs a daily [Cron Trigger](https://developers.cloudflare.com/workers/configuration/cron-triggers/)
+(`web/wrangler.jsonc`'s `triggers.crons`, handled in `web/custom-worker.js`) that
+pings Supabase to keep the free-tier project from auto-pausing after 7 days of
+inactivity. It reuses the same `NEXT_PUBLIC_SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`
+secrets above — no extra setup needed.
 
 ## Cost
 
