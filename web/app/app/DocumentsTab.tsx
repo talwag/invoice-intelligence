@@ -72,7 +72,7 @@ function SortableHeader({
       <button
         onClick={() => onSortChange(column)}
         title={`Sort by ${label.toLowerCase()}${active ? (sortDirection === "asc" ? " (currently ascending, click for descending)" : " (currently descending, click for ascending)") : ""}`}
-        className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100"
+        className="flex cursor-pointer items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100"
       >
         {label}
         {active && <span>{sortDirection === "asc" ? "↑" : "↓"}</span>}
@@ -107,7 +107,7 @@ export default function DocumentsTab({
           value={selectedMonth ?? ""}
           onChange={(e) => onMonthChange(e.target.value || null)}
           title="Filter by month"
-          className="rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-800 dark:bg-zinc-950"
+          className="cursor-pointer rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-800 dark:bg-zinc-950"
         >
           <option value="">All months</option>
           {monthOptions.map((month) => (
@@ -121,7 +121,7 @@ export default function DocumentsTab({
           value={selectedCompany ?? ""}
           onChange={(e) => onCompanyChange(e.target.value || null)}
           title="Filter by company"
-          className="rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-800 dark:bg-zinc-950"
+          className="cursor-pointer rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-800 dark:bg-zinc-950"
         >
           <option value="">All companies</option>
           {companyOptions.map((company) => (
@@ -134,7 +134,7 @@ export default function DocumentsTab({
         <button
           onClick={handleExport}
           title="Export the currently filtered and sorted documents as a CSV file"
-          className="ml-auto rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
+          className="ml-auto cursor-pointer rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
         >
           Export to CSV
         </button>
