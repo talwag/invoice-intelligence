@@ -85,6 +85,10 @@ export default function DocumentPanel({
           items: fields.items,
         }),
       });
+      if (res.status === 401) {
+        window.location.href = "/login";
+        return;
+      }
       const result = await res.json();
       if (!res.ok) {
         throw new Error(result.error ?? "שמירת השינויים נכשלה");
@@ -104,6 +108,10 @@ export default function DocumentPanel({
     setError(null);
     try {
       const res = await fetch(`/api/documents/${document.id}/pdf-url`);
+      if (res.status === 401) {
+        window.location.href = "/login";
+        return;
+      }
       const result = await res.json();
       if (!res.ok) {
         throw new Error(result.error ?? "טעינת הקובץ נכשלה");

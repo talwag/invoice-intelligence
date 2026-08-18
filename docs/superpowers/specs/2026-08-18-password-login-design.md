@@ -140,8 +140,13 @@ same way, for requests it intercepts *before* Next.js starts — but
 `web/lib/session.ts`'s functions take the secret as a parameter (not reading
 `process.env` internally), so the same pure functions work correctly whether
 called from `custom-worker.js` (with `env.APP_PASSWORD`) or from
-`web/app/api/login/route.ts` (with `process.env.APP_PASSWORD`, inlined at
-Next.js build time the normal way).
+`web/app/api/login/route.ts` (with `process.env.APP_PASSWORD`). This isn't
+build-time inlining — non-`NEXT_PUBLIC_`-prefixed server-side env vars are
+never inlined by Next.js; they stay dynamic, and `@opennextjs/cloudflare`
+populates `process.env` from the Worker's runtime bindings on each request,
+the same mechanism the pre-existing `process.env.API_KEY`/`GEMINI_API_KEY`
+checks already rely on. Rotating `APP_PASSWORD` is a runtime secret change
+(`wrangler secret put` + it takes effect immediately) — no rebuild needed.
 
 ## Data flow
 

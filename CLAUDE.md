@@ -26,6 +26,16 @@ API for external callers.
   free-tier project from auto-pausing after 7 days of inactivity.
 - Testing: Vitest (`web/lib/extractor.test.ts`) — Gemini calls are mocked via
   `vi.mock("@google/genai", ...)`, so tests run without real API calls, a key, or cost
+- Auth: `web/custom-worker.js`'s `fetch` handler gates `/app`, `/api/upload`,
+  and `/api/documents/[id]/{pdf-url,edit}` behind a single shared password
+  (a signed session cookie — see `web/lib/session.ts`), enforced before
+  Next.js ever sees the request. This runs in `custom-worker.js` rather
+  than Next.js middleware/proxy because of a confirmed compatibility bug
+  between Next.js 16's proxy architecture and `@opennextjs/cloudflare`
+  ([cloudflare/workers-sdk#13755](https://github.com/cloudflare/workers-sdk/issues/13755)).
+  `/`, `/login`, `/api/login`, `/api/logout`, and the existing
+  `X-API-Key`-gated `/api/documents` + `/api/documents/[id]` are untouched
+  by this gate.
 
 ## Project Structure
 - `/extractor.py`, `/schemas.py` — standalone Python reference implementation, not deployed
@@ -73,6 +83,16 @@ API for external callers.
   for the "Export to CSV" button
 - `/web/lib/testFixtures.ts` — shared `makeDoc()` test fixture used across the lib unit
   tests
+- `/web/lib/session.ts` — pure, unit-tested session-cookie helpers
+  (`createSessionCookie`/`verifySessionCookie`/`verifyPassword`/etc.) used
+  by both `web/custom-worker.js` and the login/logout API routes
+- `/web/app/api/login/route.ts` — POST endpoint: checks the submitted
+  password against the `APP_PASSWORD` secret, sets the signed session
+  cookie on success
+- `/web/app/api/logout/route.ts` — POST endpoint: clears the session
+  cookie
+- `/web/app/login/page.tsx` — the login page (Hebrew/RTL, matches the
+  rest of the app)
 - `/web/custom-worker.js` — the actual deployed Worker entry point (see
   `web/wrangler.jsonc`'s `"main"`); wraps `.open-next/worker.js`'s generated `fetch`
   handler and adds a `scheduled` handler for the daily Supabase keep-alive ping

@@ -100,6 +100,10 @@ npm run dev        # http://localhost:3000 (or next free port)
                     # / is the marketing landing page; the dashboard is at /app
 ```
 
+To test the login gate locally with `npm run cf:preview`, add `APP_PASSWORD=<any string>`
+to `web/.dev.vars` (gitignored, not committed) — without it, the local preview's
+gate won't work.
+
 **Tests** (`web/lib/extractor.test.ts`, using Vitest — Gemini calls are mocked,
 so this runs fast with no API key, network access, or cost):
 
@@ -130,11 +134,28 @@ npm run cf:deploy   # opennextjs-cloudflare build && opennextjs-cloudflare deplo
 
 Requires `wrangler login` once, and the following secrets set on the Worker
 (`wrangler secret put <NAME>`, not committed anywhere): `API_KEY`,
-`GEMINI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_URL`.
-Verify all four are actually set with `npx wrangler secret list` — a missing
-one is easy to miss because it doesn't break the main app (Next.js inlines
-`NEXT_PUBLIC_*` values at build time), it only silently breaks the cron job
-below, which reads secrets at runtime instead.
+`GEMINI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_URL`,
+`APP_PASSWORD`.
+Verify all five are actually set with `npx wrangler secret list`. A missing
+`NEXT_PUBLIC_SUPABASE_URL` is easy to miss because it doesn't break the main app
+(Next.js inlines `NEXT_PUBLIC_*` values at build time), it only silently breaks
+the cron job below, which reads secrets at runtime instead. A missing `APP_PASSWORD`
+is more obvious — it locks all users out of `/app` immediately (login returns 401
+on any attempt). Missing `API_KEY`, `GEMINI_API_KEY`, or `SUPABASE_SERVICE_ROLE_KEY`
+will break upload/extraction or API access.
+
+`/app`, `/api/upload`, and `/api/documents/[id]/{pdf-url,edit}` are gated
+behind a shared password (set via the `APP_PASSWORD` secret above). To
+blunt brute-force attempts against `/api/login`, add a
+[Rate Limiting Rule](https://developers.cloudflare.com/waf/rate-limiting-rules/)
+in the Cloudflare dashboard for this Worker's `/api/login` path — this is a
+manual, one-time dashboard step, not something set up by this repo's code.
+Sessions are stateless (a signed cookie, no server-side session table by
+design), so logout only clears the cookie in the browser — a session cookie
+captured before logout stays valid until its natural 30-day expiry; the only
+way to immediately revoke all sessions at once is rotating `APP_PASSWORD`,
+which invalidates every existing signed cookie since they're all signed with
+that secret.
 
 The Worker also runs a daily [Cron Trigger](https://developers.cloudflare.com/workers/configuration/cron-triggers/)
 (`web/wrangler.jsonc`'s `triggers.crons`, handled in `web/custom-worker.js`) that

@@ -40,9 +40,9 @@ function isValidPayload(body: unknown): body is EditPayload {
   );
 }
 
-// Unauthenticated, same reasoning as GET .../pdf-url: called from the
-// dashboard's own "Edit" form, not external callers, and the dashboard
-// already has no auth wall.
+// No X-API-Key check here, same reasoning as GET .../pdf-url: called from
+// the dashboard's own "Edit" form, not external callers. Still protected —
+// see web/custom-worker.js.
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
