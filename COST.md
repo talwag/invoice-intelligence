@@ -2,11 +2,11 @@
 
 ## Gemini 2.5 Flash
 
-~$5.55/month for 100 documents/day (~3,000 documents/month), standard (non-batch) API pricing.
+~$0.19/month for 100 documents/month, standard (non-batch) API pricing.
 
 **Breakdown:**
-- Input: ~2,000 tokens/document × 3,000 documents = 6M tokens/month × $0.30/1M tokens = **$1.80/month**
-- Output: ~500 tokens/document × 3,000 documents = 1.5M tokens/month × $2.50/1M tokens = **$3.75/month**
+- Input: ~2,000 tokens/document × 100 documents = 200K tokens/month × $0.30/1M tokens = **$0.06/month**
+- Output: ~500 tokens/document × 100 documents = 50K tokens/month × $2.50/1M tokens = **$0.125/month**
 
 ## Cloudflare Workers
 
@@ -18,4 +18,4 @@ Free (within the free-tier database/storage limits)
 
 ## Total
 
-**~$5.55/month**
+**~$0.19/month**

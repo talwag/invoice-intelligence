@@ -140,7 +140,7 @@ secrets above — no extra setup needed.
 
 ## Cost
 
-~$5.55/month at 100 documents/day on Gemini 2.5 Flash standard pricing —
+~$0.19/month at 100 documents/month on Gemini 2.5 Flash standard pricing —
 Cloudflare Workers and Supabase both stay within their free tiers at that
 volume. Full breakdown in [`COST.md`](./COST.md).
 
