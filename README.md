@@ -132,10 +132,13 @@ Requires `wrangler login` once, and the following secrets set on the Worker
 (`wrangler secret put <NAME>`, not committed anywhere): `API_KEY`,
 `GEMINI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_URL`,
 `APP_PASSWORD`.
-Verify all four are actually set with `npx wrangler secret list` — a missing
-one is easy to miss because it doesn't break the main app (Next.js inlines
-`NEXT_PUBLIC_*` values at build time), it only silently breaks the cron job
-below, which reads secrets at runtime instead.
+Verify all five are actually set with `npx wrangler secret list`. A missing
+`NEXT_PUBLIC_SUPABASE_URL` is easy to miss because it doesn't break the main app
+(Next.js inlines `NEXT_PUBLIC_*` values at build time), it only silently breaks
+the cron job below, which reads secrets at runtime instead. A missing `APP_PASSWORD`
+is more obvious — it locks all users out of `/app` immediately (login returns 401
+on any attempt). Missing `API_KEY`, `GEMINI_API_KEY`, or `SUPABASE_SERVICE_ROLE_KEY`
+will break upload/extraction or API access.
 
 `/app`, `/api/upload`, and `/api/documents/[id]/{pdf-url,edit}` are gated
 behind a shared password (set via the `APP_PASSWORD` secret above). To
