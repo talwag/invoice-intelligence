@@ -130,11 +130,19 @@ npm run cf:deploy   # opennextjs-cloudflare build && opennextjs-cloudflare deplo
 
 Requires `wrangler login` once, and the following secrets set on the Worker
 (`wrangler secret put <NAME>`, not committed anywhere): `API_KEY`,
-`GEMINI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_URL`.
+`GEMINI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_URL`,
+`APP_PASSWORD`.
 Verify all four are actually set with `npx wrangler secret list` — a missing
 one is easy to miss because it doesn't break the main app (Next.js inlines
 `NEXT_PUBLIC_*` values at build time), it only silently breaks the cron job
 below, which reads secrets at runtime instead.
+
+`/app`, `/api/upload`, and `/api/documents/[id]/{pdf-url,edit}` are gated
+behind a shared password (set via the `APP_PASSWORD` secret above). To
+blunt brute-force attempts against `/api/login`, add a
+[Rate Limiting Rule](https://developers.cloudflare.com/waf/rate-limiting-rules/)
+in the Cloudflare dashboard for this Worker's `/api/login` path — this is a
+manual, one-time dashboard step, not something set up by this repo's code.
 
 The Worker also runs a daily [Cron Trigger](https://developers.cloudflare.com/workers/configuration/cron-triggers/)
 (`web/wrangler.jsonc`'s `triggers.crons`, handled in `web/custom-worker.js`) that
