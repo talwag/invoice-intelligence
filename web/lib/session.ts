@@ -55,6 +55,7 @@ export function verifySessionCookie(
   const [expiryStr, signature] = parts;
   const expiry = Number(expiryStr);
   if (!Number.isFinite(expiry)) return false;
+  if (String(expiry) !== expiryStr) return false;
   if (expiry < now) return false;
 
   const expectedSignature = hmac(String(expiry), secret).toString("hex");

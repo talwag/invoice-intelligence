@@ -80,6 +80,10 @@ export default function DashboardClient({
       const formData = new FormData();
       formData.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (res.status === 401) {
+        window.location.href = "/login";
+        return;
+      }
       const result = await res.json();
 
       if (!res.ok) {
@@ -99,8 +103,14 @@ export default function DashboardClient({
   }
 
   async function handleLogout() {
-    await fetch("/api/logout", { method: "POST" });
-    window.location.href = "/";
+    try {
+      await fetch("/api/logout", { method: "POST" });
+    } catch {
+      // Network error clearing the cookie server-side — still navigate away
+      // so the user isn't stuck on the page believing logout silently failed.
+    } finally {
+      window.location.href = "/";
+    }
   }
 
   return (

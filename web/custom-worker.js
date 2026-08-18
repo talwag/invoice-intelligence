@@ -6,8 +6,7 @@ export { DOQueueHandler, DOShardedTagCache, BucketCachePurge } from "./.open-nex
 const PROTECTED_API_PATTERN = /^\/api\/documents\/[^/]+\/(pdf-url|edit)$/;
 
 function isProtectedPath(pathname) {
-  const normalized =
-    pathname.length > 1 && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+  const normalized = pathname.replace(/\/+$/, "") || "/";
   return (
     normalized === "/app" ||
     normalized === "/api/upload" ||
@@ -15,23 +14,47 @@ function isProtectedPath(pathname) {
   );
 }
 
+// Builds the "not logged in" response for a gated request: 401 JSON for API
+// paths, a redirect to /login for page paths. Used both when the session
+// cookie is missing/invalid and when APP_PASSWORD itself isn't configured
+// (fail closed in both cases, identically).
+function unauthorizedResponse(request, pathname) {
+  if (pathname.startsWith("/api/")) {
+    return new Response(
+      JSON.stringify({ error: "פג תוקף החיבור, יש להתחבר מחדש" }),
+      {
+        status: 401,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+        },
+      }
+    );
+  }
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: new URL("/login", request.url).toString(),
+      "Cache-Control": "no-store",
+    },
+  });
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     if (isProtectedPath(url.pathname)) {
+      if (!env.APP_PASSWORD) {
+        return unauthorizedResponse(request, url.pathname);
+      }
+
       const cookieHeader = request.headers.get("Cookie");
       const sessionValue = getCookieValue(cookieHeader, SESSION_COOKIE_NAME);
       const isLoggedIn = verifySessionCookie(sessionValue, env.APP_PASSWORD, Date.now());
 
       if (!isLoggedIn) {
-        if (url.pathname.startsWith("/api/")) {
-          return new Response(JSON.stringify({ error: "Unauthorized" }), {
-            status: 401,
-            headers: { "Content-Type": "application/json" },
-          });
-        }
-        return Response.redirect(new URL("/login", request.url).toString(), 302);
+        return unauthorizedResponse(request, url.pathname);
       }
     }
 

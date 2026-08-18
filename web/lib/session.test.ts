@@ -76,6 +76,16 @@ describe("createSessionCookie / verifySessionCookie", () => {
     expect(verifySessionCookie(null, "my-secret")).toBe(false);
     expect(verifySessionCookie(undefined, "my-secret")).toBe(false);
   });
+
+  it("rejects a non-canonical expiry string that still parses to a valid, unexpired number", () => {
+    const cookie = createSessionCookie("my-secret");
+    const [expiry, signature] = cookie.split(".");
+    // "+<expiry>" parses via Number() to the same value, but doesn't
+    // round-trip through String() back to the original literal text, so it
+    // must not verify against the canonical signature.
+    const nonCanonical = `+${expiry}.${signature}`;
+    expect(verifySessionCookie(nonCanonical, "my-secret")).toBe(false);
+  });
 });
 
 describe("buildSessionCookieHeader", () => {

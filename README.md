@@ -100,6 +100,10 @@ npm run dev        # http://localhost:3000 (or next free port)
                     # / is the marketing landing page; the dashboard is at /app
 ```
 
+To test the login gate locally with `npm run cf:preview`, add `APP_PASSWORD=<any string>`
+to `web/.dev.vars` (gitignored, not committed) — without it, the local preview's
+gate won't work.
+
 **Tests** (`web/lib/extractor.test.ts`, using Vitest — Gemini calls are mocked,
 so this runs fast with no API key, network access, or cost):
 
@@ -146,6 +150,12 @@ blunt brute-force attempts against `/api/login`, add a
 [Rate Limiting Rule](https://developers.cloudflare.com/waf/rate-limiting-rules/)
 in the Cloudflare dashboard for this Worker's `/api/login` path — this is a
 manual, one-time dashboard step, not something set up by this repo's code.
+Sessions are stateless (a signed cookie, no server-side session table by
+design), so logout only clears the cookie in the browser — a session cookie
+captured before logout stays valid until its natural 30-day expiry; the only
+way to immediately revoke all sessions at once is rotating `APP_PASSWORD`,
+which invalidates every existing signed cookie since they're all signed with
+that secret.
 
 The Worker also runs a daily [Cron Trigger](https://developers.cloudflare.com/workers/configuration/cron-triggers/)
 (`web/wrangler.jsonc`'s `triggers.crons`, handled in `web/custom-worker.js`) that
