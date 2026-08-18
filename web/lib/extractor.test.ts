@@ -106,6 +106,13 @@ describe("extractInvoice", () => {
     expect(result.vendor).toBe("Acme Ltd");
   });
 
+  it("disables Gemini's thinking budget, since this is structured extraction, not reasoning", async () => {
+    mockGenerateContent.mockResolvedValue({ text: JSON.stringify(validPayload) });
+    await extractInvoice(fakePdf, "application/pdf");
+    const call = mockGenerateContent.mock.calls[0][0];
+    expect(call.config.thinkingConfig).toEqual({ thinkingBudget: 0 });
+  });
+
   it("throws when Gemini returns malformed JSON", async () => {
     mockGenerateContent.mockResolvedValue({ text: "not json{{{" });
     await expect(extractInvoice(fakePdf, "application/pdf")).rejects.toThrow(

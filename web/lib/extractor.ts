@@ -145,6 +145,9 @@ export async function extractInvoice(
         config: {
           responseMimeType: "application/json",
           abortSignal: controller.signal,
+          // Structured field extraction, not reasoning — thinking tokens are
+          // billed as output tokens with no accuracy benefit here.
+          thinkingConfig: { thinkingBudget: 0 },
         },
       });
       responseText = response.text;
