@@ -6,10 +6,12 @@ export { DOQueueHandler, DOShardedTagCache, BucketCachePurge } from "./.open-nex
 const PROTECTED_API_PATTERN = /^\/api\/documents\/[^/]+\/(pdf-url|edit)$/;
 
 function isProtectedPath(pathname) {
+  const normalized =
+    pathname.length > 1 && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
   return (
-    pathname === "/app" ||
-    pathname === "/api/upload" ||
-    PROTECTED_API_PATTERN.test(pathname)
+    normalized === "/app" ||
+    normalized === "/api/upload" ||
+    PROTECTED_API_PATTERN.test(normalized)
   );
 }
 
