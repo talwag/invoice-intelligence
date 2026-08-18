@@ -98,6 +98,11 @@ export default function DashboardClient({
     }
   }
 
+  async function handleLogout() {
+    await fetch("/api/logout", { method: "POST" });
+    window.location.href = "/";
+  }
+
   return (
     <div className="min-h-full flex-1 bg-zinc-50 dark:bg-black">
       <div className="mx-auto max-w-5xl px-6 py-10">
@@ -106,7 +111,14 @@ export default function DashboardClient({
             Invoice Intelligence
           </h1>
 
-          <div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleLogout}
+              title="התנתק מהאפליקציה"
+              className="cursor-pointer rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+              התנתק
+            </button>
             <input
               ref={fileInputRef}
               type="file"
