@@ -3,10 +3,10 @@ import { supabase } from "@/lib/supabase";
 
 const SIGNED_URL_EXPIRY_SECONDS = 300;
 
-// Unauthenticated, unlike GET /api/documents/[id]: this route is called
-// from the dashboard's own client-side "View PDF" button, not external
-// callers, and the dashboard itself already has no auth wall — anyone who
-// can load /app can already see every document's extracted data.
+// No X-API-Key check here, unlike GET /api/documents/[id]: this route is
+// called from the dashboard's own client-side "View PDF" button, not
+// external callers. It's still protected — web/custom-worker.js gates
+// this exact path behind the session cookie before Next.js ever sees it.
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }

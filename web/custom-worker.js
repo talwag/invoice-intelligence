@@ -1,9 +1,40 @@
 import handler from "./.open-next/worker.js";
+import { getCookieValue, verifySessionCookie, SESSION_COOKIE_NAME } from "./lib/session.ts";
 
 export { DOQueueHandler, DOShardedTagCache, BucketCachePurge } from "./.open-next/worker.js";
 
+const PROTECTED_API_PATTERN = /^\/api\/documents\/[^/]+\/(pdf-url|edit)$/;
+
+function isProtectedPath(pathname) {
+  return (
+    pathname === "/app" ||
+    pathname === "/api/upload" ||
+    PROTECTED_API_PATTERN.test(pathname)
+  );
+}
+
 export default {
-  fetch: handler.fetch,
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    if (isProtectedPath(url.pathname)) {
+      const cookieHeader = request.headers.get("Cookie");
+      const sessionValue = getCookieValue(cookieHeader, SESSION_COOKIE_NAME);
+      const isLoggedIn = verifySessionCookie(sessionValue, env.APP_PASSWORD, Date.now());
+
+      if (!isLoggedIn) {
+        if (url.pathname.startsWith("/api/")) {
+          return new Response(JSON.stringify({ error: "Unauthorized" }), {
+            status: 401,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+        return Response.redirect(new URL("/login", request.url).toString(), 302);
+      }
+    }
+
+    return handler.fetch(request, env, ctx);
+  },
 
   // Cloudflare Cron Trigger (see wrangler.jsonc's "triggers.crons"). Pings
   // Supabase daily so the free-tier project's REST API never sits idle long
