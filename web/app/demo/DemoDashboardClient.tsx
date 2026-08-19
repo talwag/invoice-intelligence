@@ -84,7 +84,7 @@ export default function DemoDashboardClient({
             <button
               onClick={() => setPickerOpen((open) => !open)}
               disabled={!!addingPreset || availablePresets.length === 0}
-              title="הוסף חשבונית לדוגמה"
+              title={availablePresets.length === 0 ? "כל הדוגמאות כבר נוספו" : "הוסף חשבונית לדוגמה"}
               className="flex cursor-pointer items-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:cursor-default disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
             >
               {addingPreset && (

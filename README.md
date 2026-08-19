@@ -5,7 +5,7 @@ confidence score) in seconds — via a small Next.js dashboard and a REST API.
 
 ## What it does
 
-`/` is a static marketing landing page; the dashboard itself lives at `/app`.
+`/` is a static marketing landing page (its CTA links to a separately-deployed public demo, not `/app`); the dashboard itself lives at `/app`; a public demo with no real backend calls lives at `/demo` (see "Demo deploy" below).
 
 1. You drop a PDF invoice into the dashboard at `/app` (or `POST` it to `/api/upload`).
 2. The file is stored, a `documents` row is created with `status: "processing"`.
@@ -18,7 +18,7 @@ confidence score) in seconds — via a small Next.js dashboard and a REST API.
 ## Architecture
 
 ```
-Browser (/ landing page, /app dashboard)
+Browser (/ landing page, /app dashboard, /demo public demo)
    │  Server Component fetch — no auth needed, runs server-side only
    ▼
 Next.js App Router  ──────────────────────────►  external caller (curl, a CRM, …)
@@ -97,7 +97,8 @@ API key:
 
 ```bash
 npm run dev        # http://localhost:3000 (or next free port)
-                    # / is the marketing landing page; the dashboard is at /app
+                    # / is the marketing landing page, the dashboard is at
+                    # /app, and the public no-backend demo is at /demo
 ```
 
 To test the login gate locally with `npm run cf:preview`, add `APP_PASSWORD=<any string>`
