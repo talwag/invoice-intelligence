@@ -163,6 +163,37 @@ pings Supabase to keep the free-tier project from auto-pausing after 7 days of
 inactivity. It reuses the same `NEXT_PUBLIC_SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`
 secrets above — no extra setup needed, as long as they're confirmed set (see above).
 
+## Demo deploy
+
+The public `/demo` route (no auth, no real Supabase/Gemini calls) is
+deployed separately from production, under a **different Cloudflare
+account** — not just a different Worker under the same account. This is
+deliberate: Cloudflare's free `*.workers.dev` URLs are
+`<worker-name>.<account-subdomain>.workers.dev`, and the account-subdomain
+segment is shared across every Worker in one account. Since the demo's URL
+has to be public (it's linked from the landing page), a same-account demo
+Worker would leak the account subdomain into the public repo, letting
+anyone guess or brute-force sibling Worker names — including the real
+one — on that same subdomain. See
+`docs/superpowers/specs/2026-08-19-demo-design.md` for the full reasoning.
+
+```bash
+cd web
+npm run cf:deploy:demo
+```
+
+Requires being logged into that separate Cloudflare account (`wrangler login`,
+or a scoped `CLOUDFLARE_API_TOKEN` for that account) when running this —
+if you're logged into the same account as production, this will deploy the
+demo there instead, defeating the point. No secrets need to be set on this
+Worker at all (no `APP_PASSWORD`, no Supabase, no Gemini) — the demo never
+calls any of them.
+
+After deploying, update the CTA link in
+`web/app/_components/landing/Footer.tsx` with the real resulting
+`*.workers.dev` URL (currently a placeholder), then redeploy production
+(`npm run cf:deploy`) so the landing page picks up the change.
+
 ## Cost
 
 Max ~$0.19/month at 100 documents/month on Gemini 2.5 Flash standard pricing

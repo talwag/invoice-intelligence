@@ -58,8 +58,11 @@ API for external callers.
   `web/lib/invoiceMath.ts` (never trusts client-sent totals), re-validates
   the merged object with `extractor.ts`'s `validateInvoiceExtraction`, and
   sets `edited_at`. No `X-API-Key`, same reasoning as pdf-url
-- `/web/app/page.tsx` — the marketing landing page (static, no data fetching);
-  links to `/app` for the actual dashboard
+- `/web/app/page.tsx` — the marketing landing page (static, no data fetching)
+- The landing page's CTA links to the public demo (`/demo` on a separate
+  Worker deployment, see `web/wrangler.demo.jsonc`), not to `/app` —
+  nothing on the landing page or in the demo links to `/login` or to the
+  real production Worker's URL.
 - `/web/app/_components/landing/` — Hero, Benefits, HowItWorks,
   SampleExtraction, Footer — the landing page's section components
 - `/web/app/app/page.tsx` — Server Component: fetches documents directly via
@@ -96,6 +99,27 @@ API for external callers.
 - `/web/custom-worker.js` — the actual deployed Worker entry point (see
   `web/wrangler.jsonc`'s `"main"`); wraps `.open-next/worker.js`'s generated `fetch`
   handler and adds a `scheduled` handler for the daily Supabase keep-alive ping
+- `/web/lib/demoData.ts` — hardcoded sample `Document[]` and preset "add a
+  sample" options used only by the public demo
+- `/web/app/demo/page.tsx` — the public demo's entry page (no auth, no
+  real Supabase/Gemini calls anywhere in this route)
+- `/web/app/demo/DemoDashboardClient.tsx` — demo-only counterpart to
+  `DashboardClient.tsx`: same UI, but "upload" picks from 3 hardcoded
+  presets (simulated delay, no network call) instead of a real file
+  input, and there's no logout control
+- `/web/app/demo/DemoDocumentPanel.tsx` — demo-only counterpart to
+  `DocumentPanel.tsx`: same read/edit UI, but "View PDF" opens a bundled
+  static sample PDF directly and "Save" updates local state instead of
+  calling the real edit endpoint
+- `/web/public/demo-samples/*.pdf` — 3 bundled sample invoice PDFs used
+  only by the demo's "View PDF" button
+- `/web/wrangler.demo.jsonc` — a second Wrangler config (different
+  `name`, no cron trigger) for deploying the demo as its own Cloudflare
+  Worker, under a **separate Cloudflare account** from production — see
+  `docs/superpowers/specs/2026-08-19-demo-design.md` for why a separate
+  account (not just a separate Worker) is required to keep the demo's
+  necessarily-public URL from revealing anything about the real
+  production Worker's URL
 
 ## API Authentication
 `/api/documents` and `/api/documents/[id]` require header: `X-API-Key: {API_KEY}`.

@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf:deploy:demo": "opennextjs-cloudflare build && wrangler deploy --config wrangler.demo.jsonc"
   },
   "dependencies": {
     "@google/genai": "^2.12.0",
