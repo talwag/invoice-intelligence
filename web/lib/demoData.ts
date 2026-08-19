@@ -196,9 +196,9 @@ export const DEMO_PRESETS: DemoPreset[] = [
 export const DEMO_PDF_PATHS: Record<string, string> = {
   "demo-doc-1": "/demo-samples/sample-1.pdf",
   "demo-doc-2": "/demo-samples/sample-2.pdf",
-  "demo-doc-3": "/demo-samples/sample-1.pdf",
+  "demo-doc-3": "/demo-samples/sample-4.pdf",
   "demo-doc-4": "/demo-samples/sample-3.pdf",
-  "demo-doc-5": "/demo-samples/sample-1.pdf",
-  "demo-doc-6": "/demo-samples/sample-2.pdf",
-  "demo-doc-7": "/demo-samples/sample-3.pdf",
+  "demo-doc-5": "/demo-samples/sample-5.pdf",
+  "demo-doc-6": "/demo-samples/sample-6.pdf",
+  "demo-doc-7": "/demo-samples/sample-7.pdf",
 };

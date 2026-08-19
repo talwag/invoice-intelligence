@@ -90,7 +90,8 @@ export default function DemoDocumentPanel({
   }
 
   function handleViewPdf() {
-    const pdfPath = DEMO_PDF_PATHS[document.id] ?? "/demo-samples/sample-1.pdf";
+    const pdfPath = DEMO_PDF_PATHS[document.id];
+    if (!pdfPath) return;
     window.open(pdfPath, "_blank", "noopener,noreferrer");
   }
 
