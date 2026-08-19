@@ -4,3 +4,4 @@ __pycache__/
 .venv/
 *.pdf
 .claude/worktrees/
+!web/public/demo-samples/*.pdf
