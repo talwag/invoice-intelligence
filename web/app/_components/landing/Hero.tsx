@@ -9,11 +9,15 @@ export default function Hero() {
           העלה כל חשבונית. קבל בחזרה ספק, פריטים, מע&quot;מ וסכומים — מחולצים
           אוטומטית ומוכנים לשימוש.
         </p>
+        {/* TODO: replace with the real demo Worker's URL once it's deployed
+            (Task 6, Step 6 of docs/superpowers/plans/2026-08-19-demo.md) —
+            this placeholder cannot be the real value until that Worker
+            exists and its URL is known. */}
         <a
-          href="/app"
+          href="https://your-demo-worker.your-demo-account-subdomain.workers.dev/demo"
           className="mt-8 inline-block rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700"
         >
-          פתח את האפליקציה
+          נסו את הדמו
         </a>
       </div>
     </section>
