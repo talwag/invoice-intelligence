@@ -3,28 +3,24 @@ import type { Document } from "./dashboardAggregations";
 export const DEMO_DOCUMENTS: Document[] = [
   {
     id: "demo-doc-1",
-    filename: "invoice-food-2023-08.pdf",
+    filename: "invoice-alpha-2026-06.pdf",
     status: "done",
     confidence: 0.95,
-    created_at: "2023-08-02T10:00:00.000Z",
+    created_at: "2026-06-03T09:00:00.000Z",
     edited_at: null,
     extracted_data: {
-      // Real invoice PDF (a genuine, professionally-generated document —
-      // this is what fixed the earlier hand-rolled-PDF rendering bugs), with
-      // the actual vendor's name/ID replaced since this is public-facing.
-      vendor: "אפסילון מזון בע״מ",
-      vendor_id: null,
-      invoice_number: "3606951",
-      invoice_date: "2023-08-02",
-      due_date: null,
+      vendor: "טכנולוגיות אלפא בע״מ",
+      vendor_id: "512345671",
+      invoice_number: "INV-2026-0101",
+      invoice_date: "2026-06-03",
+      due_date: "2026-07-03",
       items: [
-        { description: "וילי פוד שמן קנולה מזוכך", quantity: 6, unit_price: 8.3, line_total: 49.8 },
-        { description: "פטל מצופה בשוקולד לבן ושוקולד חלב", quantity: 1, unit_price: 24.4, line_total: 24.4 },
+        { description: "רישיון תוכנה שנתי", quantity: 1, unit_price: 1000, line_total: 1000 },
       ],
-      subtotal: 63.42,
+      subtotal: 1000,
       vat_rate: 0.17,
-      vat_amount: 10.78,
-      total: 74.2,
+      vat_amount: 170,
+      total: 1170,
       currency: "ILS",
       confidence: 0.95,
     },

@@ -12,15 +12,15 @@ export default function SampleExtraction() {
           <div className="w-full max-w-xs rounded-lg border border-zinc-200 bg-white p-4 text-start shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
             <div className="flex justify-between text-sm">
               <span className="text-zinc-500">ספק</span>
-              <span className="font-medium text-zinc-900 dark:text-zinc-50">אפסילון מזון בע״מ</span>
+              <span className="font-medium text-zinc-900 dark:text-zinc-50">טכנולוגיות אלפא בע״מ</span>
             </div>
             <div className="mt-2 flex justify-between text-sm">
               <span className="text-zinc-500">מספר חשבונית</span>
-              <span className="font-medium text-zinc-900 dark:text-zinc-50">3606951</span>
+              <span className="font-medium text-zinc-900 dark:text-zinc-50">INV-2026-0101</span>
             </div>
             <div className="mt-2 flex justify-between text-sm">
               <span className="text-zinc-500">סה&quot;כ</span>
-              <span className="font-medium text-zinc-900 dark:text-zinc-50">₪74.20</span>
+              <span className="font-medium text-zinc-900 dark:text-zinc-50">₪1,170.00</span>
             </div>
             <div className="mt-2 flex justify-between text-sm">
               <span className="text-zinc-500">רמת ביטחון</span>
