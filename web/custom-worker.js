@@ -44,6 +44,19 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+    // The demo Worker is a full deployment of this same app (see
+    // wrangler.demo.jsonc), so its bare root would otherwise render the
+    // real marketing landing page too. Nobody reaches that URL through the
+    // normal flow (the real landing page's CTA links straight to /demo),
+    // but send it straight to /demo anyway rather than show a redundant
+    // duplicate landing page.
+    if (env.IS_DEMO_DEPLOYMENT && url.pathname === "/") {
+      return new Response(null, {
+        status: 302,
+        headers: { Location: new URL("/demo", request.url).toString() },
+      });
+    }
+
     if (isProtectedPath(url.pathname)) {
       if (!env.APP_PASSWORD) {
         return unauthorizedResponse(request, url.pathname);

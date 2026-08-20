@@ -3,6 +3,9 @@
   "main": "custom-worker.js",
   "compatibility_date": "2026-07-21",
   "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "IS_DEMO_DEPLOYMENT": "true"
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
